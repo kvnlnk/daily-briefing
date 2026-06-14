@@ -12,17 +12,36 @@ sources requires zero changes to the orchestrator.
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Language | Python 3.11+ | Your VPS stack, pip-installable, readable for skill integration |
-| HTTP client | `requests` (stdlib alternative) | Only external dep; `urllib` if zero-deps preferred |
-| Config | YAML (`brief.yaml`) | Readable, batteries-included via stdlib |
-| Concurrency | `concurrent.futures.ThreadPoolExecutor` | Sources are I/O-bound; threads are the idiomatic Python choice |
+| Language | Python 3.11 | Already on this system; pip-installable; readable for skill integration |
+| CLI framework | `click` 8.3 (already installed) | Fast, composable subcommands; no new dep |
+| Terminal output | `rich` 14.3 (already installed) | Beautiful tables/progress for `--verbose` mode |
+| HTTP client | `requests` 2.33 (already installed) | All APIs are REST; no async needed |
+| Config | YAML (`brief.yaml`) via `PyYAML` 6.0 (already installed) | Also `ruamel.yaml` available for round-trip edits |
+| Concurrency | `concurrent.futures.ThreadPoolExecutor` | Sources are I/O-bound; threads are idiomatic Python |
 | History | SQLite via `sqlite3` stdlib | Zero-dependency local storage for yesterday-vs-today diff |
-| RSS parsing | `feedparser` | Battle-tested, handles malformed feeds |
+| RSS parsing | `feedparser` (one new dep) | Battle-tested, handles malformed feeds; used for Reddit + News |
+| Calendar SDK | `google-api-python-client` (already installed) | Hermes `google-workspace` skill has OAuth setup script |
+| GitHub | `gh` CLI via `subprocess` (already installed) | Already authenticated; no token management in code |
 | Package format | `pyproject.toml` (setuptools) | PEP 621 standard |
 | LLM integration | External (Hermes manages this) | This project produces the *text*; Hermes cron + LLM handles summarization |
 | Delivery | Hermes `send_message` | One function call from the SKILL.md, no delivery code in this repo |
 
+### Existing tools leveraged (not rebuilt)
+
+| Tool | Installed | Used for | How |
+|---|---|---|---|
+| `gh` CLI | ✅ | GitHub notifications + PRs | `subprocess.run(["gh", "api", ...])` |
+| `google-api-python-client` | ✅ | Google Calendar events | Direct SDK usage, OAuth via `google-workspace` skill |
+| `feedparser` | ⬜ `pip install` | Reddit RSS + News RSS | Universal RSS/Atom parser |
+| `himalaya` | ⬜ `pip install` (or `imaplib`) | Email unread count | PIP-installable CLI or stdlib fallback |
+| Open-Meteo | 🌐 Free REST API | Weather | Direct `requests.get()`, no wrapper needed |
+| DB transport.rest | 🌐 Free REST API | Bahn departures | Direct `requests.get()` (tested: reachable from user VPS) |
+| Reddit RSS | 🌐 Free, no auth | Reddit top posts | `reddit.com/r/{sub}/top/.rss` |
+
 **Deliberate non-choices:**
+- **No `openmeteo-requests` wrapper** — the REST API is 1 GET call; a wrapper adds a dep for zero benefit
+- **No `praw` (Reddit SDK)** — requires API key + app registration; RSS is zero-auth and sufficient for top posts
+- **No `blogwatcher-cli`** — overkill; `feedparser` handles our 2-3 feeds perfectly
 - No FastAPI/Flask — this is a CLI tool, not a server
 - No `asyncio` — added complexity without benefit for 7 I/O-bound sources
 - No ORM for SQLite — `sqlite3` stdlib is 50 lines for our schema
