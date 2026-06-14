@@ -1,0 +1,38 @@
+# Daily Briefing Configuration
+# Each source has an 'enabled' flag and source-specific options.
+# Sources run in parallel; priority controls display order.
+
+sources:
+  weather:
+    enabled: true
+    priority: 10        # shown first
+  calendar:
+    enabled: true
+    priority: 20
+  github:
+    enabled: true
+    priority: 30
+  bahn:
+    enabled: true
+    priority: 40
+  reddit:
+    enabled: true
+    priority: 50
+  news:
+    enabled: true
+    priority: 60
+  email:
+    enabled: false      # disabled by default — requires IMAP creds
+
+# Briefing output settings
+output:
+  max_length: 800        # Max characters for WhatsApp message
+  include_diff: true     # Compare with yesterday where possible
+  tone: friendly         # friendly | concise | technical
+  emoji: true            # Include emoji in output
+  timezone: Europe/Berlin
+
+# Delivery (used by Hermes cron integration)
+delivery:
+  platform: whatsapp     # whatsapp | telegram | local
+  time: "06:30"          # When to send (in timezone above)
