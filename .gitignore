@@ -31,5 +31,5 @@ Thumbs.db
 histfile
 
 # Site (Vite build output)
-site-dist/
+site/dist/
 site/node_modules/
