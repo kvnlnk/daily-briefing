@@ -30,15 +30,31 @@ This project was built entirely through natural language conversations with [Her
 | Layer | Technology |
 |---|---|
 | Language | Python 3.11 |
-| CLI framework | `click` 8.3 |
-| Terminal output | `rich` 14.3 |
-| HTTP client | `requests` 2.33 |
-| Config | YAML via `PyYAML` 6.0 |
-| Calendar SDK | `google-api-python-client` |
-| RSS parsing | `feedparser` 6.0 |
-| GitHub access | `gh` CLI via `subprocess` |
+| CLI framework | [`click`](https://click.palletsprojects.com/) 8.3 |
+| Terminal output | [`rich`](https://rich.readthedocs.io/) 14.3 |
+| HTTP client | [`requests`](https://requests.readthedocs.io/) 2.33 |
+| Config | YAML via [`PyYAML`](https://pyyaml.org/) 6.0 |
+| Calendar SDK | [`google-api-python-client`](https://github.com/googleapis/google-api-python-client) |
+| RSS parsing | [`feedparser`](https://github.com/kurtmckee/feedparser/) 6.0 |
+| GitHub access | [`gh` CLI](https://cli.github.com/) via `subprocess` |
 | Storage | SQLite via `sqlite3` stdlib |
 | Concurrency | `concurrent.futures` |
+
+## 🔄 Tools & Libraries Leveraged
+
+This project reuses existing battle-tested tools instead of reinventing wheels:
+
+| Tool | Used for | Why |
+|---|---|---|
+| [`gh` CLI](https://cli.github.com/) | GitHub API calls | Already authenticated, works with minimal token scopes via GraphQL |
+| [`google-api-python-client`](https://github.com/googleapis/google-api-python-client) | Google Calendar events | Already installed; OAuth via [Hermes google-workspace skill](https://hermes-agent.nousresearch.com/docs) |
+| [`click`](https://click.palletsprojects.com/) | CLI interface | Already installed; composable subcommands, auto-help text |
+| [`rich`](https://rich.readthedocs.io/) | Terminal output | Already installed; beautiful verbose mode tables |
+| [`feedparser`](https://github.com/kurtmckee/feedparser/) | RSS/Atom parsing | Universal parser for Reddit + news feeds |
+| [`requests`](https://requests.readthedocs.io/) | HTTP client | Already installed; simple REST calls (Open-Meteo, DB API) |
+| [`imaplib`](https://docs.python.org/3/library/imaplib.html) (stdlib) | Email fetch | Zero deps — built into Python stdlib |
+
+**Deliberately skipped:** `openmeteo-requests` (one REST call, no wrapper needed), `praw` (Reddit API key not needed — RSS is sufficient), `blogwatcher-cli` (overkill for 2-3 feeds), `himalaya` (stdlib `imaplib` is simpler).
 
 ---
 

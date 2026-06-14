@@ -29,3 +29,7 @@ Thumbs.db
 
 # CLI-specific
 histfile
+
+# Site (Vite build output)
+site-dist/
+site/node_modules/
