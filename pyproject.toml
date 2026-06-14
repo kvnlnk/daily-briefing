@@ -8,8 +8,10 @@ version = "0.1.0"
 description = "AI-powered morning briefing — weather, calendar, GitHub, commute, and news in one WhatsApp message"
 requires-python = ">=3.11"
 dependencies = [
-    "requests>=2.31",
+    "click>=8.0",
     "feedparser>=6.0",
+    "pyyaml>=6.0",
+    "requests>=2.31",
 ]
 
 [project.optional-dependencies]
