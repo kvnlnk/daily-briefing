@@ -30,7 +30,11 @@ Thumbs.db
 # CLI-specific
 histfile
 
+# Personal config — each user creates their own
+brief.yaml
+
 # Site (Vite build output)
 site/dist/
 site/node_modules/
+site-dist/
 .worktrees/

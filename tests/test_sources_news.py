@@ -4,6 +4,15 @@ import pytest
 from daily_briefing.sources.news import NewsSource
 
 
+class TestNewsConfig:
+    def test_missing_feeds_returns_error(self):
+        """With no feeds configured, returns error instead of using defaults."""
+        source = NewsSource()
+        result = source.fetch({"sources": {"news": {}}})
+        assert result.is_success() is False
+        assert "No news feeds configured" in result.error
+
+
 class TestNewsTimeout:
     def test_fetch_feed_uses_requests_with_timeout(self):
         """_fetch_feed should use requests.get with timeout=10 and User-Agent."""

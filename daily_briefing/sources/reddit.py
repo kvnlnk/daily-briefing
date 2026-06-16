@@ -20,7 +20,7 @@ import requests
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
-DEFAULT_SUBREDDITS = os.environ.get("REDDIT_SUBREDDITS", "programming,de")
+# DEFAULT_SUBREDDITS removed — subreddits are exclusively from brief.yaml or ENV
 MAX_POSTS_PER_SUB = 3
 
 
@@ -32,7 +32,13 @@ class RedditSource(SourceProtocol):
     def fetch(self, config: dict[str, Any]) -> SourceResult:
         """Fetch top posts from all configured subreddits."""
         source_config = config.get("sources", {}).get("reddit", {})
-        subreddits_raw = source_config.get("subreddits", DEFAULT_SUBREDDITS)
+        subreddits_raw = source_config.get("subreddits", None)
+        if not subreddits_raw:
+            return SourceResult(
+                name=self.name,
+                priority=50,
+                error="No subreddits configured. Add sources.reddit.subreddits to brief.yaml",
+            )
         if isinstance(subreddits_raw, str):
             subreddits = [s.strip() for s in subreddits_raw.split(",") if s.strip()]
         else:
@@ -70,7 +76,7 @@ class RedditSource(SourceProtocol):
     def _fetch_subreddit(self, subreddit: str) -> list[dict[str, Any]]:
         """Fetch top posts from a single subreddit."""
         url = f"https://www.reddit.com/r/{subreddit}/top/.rss?t=day&limit={MAX_POSTS_PER_SUB}"
-        headers = {"User-Agent": "DailyBriefing/1.0 (Hermes Agent; +https://github.com/kvnlnk/daily-briefing)"}
+        headers = {"User-Agent": "DailyBriefing/1.0 (+https://github.com/kvnlnk/daily-briefing)"}
         resp = requests.get(url, timeout=10, headers=headers)
         resp.raise_for_status()
         feed = feedparser.parse(resp.content)

@@ -18,34 +18,11 @@ class TestWeatherSource:
     def test_name(self, source):
         assert source.name == "weather"
 
-    @patch("daily_briefing.sources.weather.requests.get")
-    def test_single_location_fallback(self, mock_get, source):
-        """When no locations in config, uses env var defaults."""
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = {
-            "current": {
-                "temperature_2m": 18.5,
-                "relative_humidity_2m": 65,
-                "apparent_temperature": 17.0,
-                "weather_code": 2,
-                "wind_speed_10m": 12.0,
-                "precipitation": 0.0,
-            },
-            "daily": {
-                "temperature_2m_max": [22.0],
-                "temperature_2m_min": [12.0],
-                "precipitation_probability_max": [30],
-            },
-        }
-
+    def test_missing_locations_returns_error(self, source):
+        """When no locations in config, returns clear error instead of defaults."""
         result = source.fetch({"sources": {"weather": {}}})
-        assert result.is_success()
-        data = result.data
-        assert data["location"] is not None
-        assert data["condition"] == "Partly cloudy"
-        assert data["high"] == 22.0
-        assert data["low"] == 12.0
-        assert data["rain_chance"] == 30
+        assert result.is_success() is False
+        assert "Weather not configured" in result.error
 
     @patch("daily_briefing.sources.weather.requests.get")
     def test_multiple_locations(self, mock_get, source):
@@ -106,6 +83,12 @@ class TestWeatherSource:
 
         mock_get.side_effect = requests.RequestException("Connection refused")
 
-        result = source.fetch({"sources": {"weather": {}}})
+        result = source.fetch({
+            "sources": {
+                "weather": {
+                    "locations": [{"name": "Test", "lat": 50.0, "lon": 8.0}],
+                },
+            },
+        })
         assert result.is_success() is False
         assert "Connection refused" in result.error

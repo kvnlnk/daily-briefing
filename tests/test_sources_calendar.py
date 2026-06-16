@@ -4,9 +4,10 @@ import datetime
 from zoneinfo import ZoneInfo
 
 from daily_briefing.sources.calendar import (
-    TZ_BERLIN,
     today_start_in_tz,
 )
+
+TZ_BERLIN = ZoneInfo("Europe/Berlin")
 
 
 class TestTimezone:

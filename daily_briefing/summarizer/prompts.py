@@ -1,11 +1,7 @@
 """Prompt templates and formatting for LLM summarization.
 
-This module builds the prompt that the controlling LLM (Hermes) uses to
-generate the final WhatsApp briefing message. The prompt includes:
-
-1. Source data from all fetched modules
-2. Yesterday's comparison (from storage diff)
-3. Output format constraints (max chars, emoji, tone)
+This module builds the prompt that the configured LLM uses to
+generate the final briefing message. The prompt includes:
 """
 
 from __future__ import annotations
@@ -24,7 +20,7 @@ def build_prompt(
     """Build the LLM prompt from fetched data and config.
 
     The prompt is structured so the LLM can produce a concise,
-    WhatsApp-friendly message.
+    briefing-friendly message.
 
     Args:
         results: All fetched SourceResults (including errors).
@@ -54,7 +50,7 @@ def build_prompt(
     # Add output constraints
     parts.append("---")
     parts.append("AUSGABE-FORMAT:")
-    parts.append(f"- Maximal {config.max_length} Zeichen (WhatsApp-kompatibel)")
+    parts.append(f"- Maximal {config.max_length} Zeichen")
     parts.append(f"- Ton: {config.tone}")
     if config.emoji:
         parts.append("- Verwende Emoji wo passend")
@@ -64,7 +60,7 @@ def build_prompt(
     parts.append("- Keine Bullet-Points oder Aufzählungen — ein Fließtext")
     parts.append("- Erwähne fehlerhafte Quellen kurz (z.B. 'Bahn-Daten heute nicht verfügbar')")
     parts.append("")
-    parts.append("Generiere JETZT die WhatsApp-Nachricht:")
+    parts.append("Generiere JETZT die Nachricht:")
 
     return "\n".join(parts)
 
@@ -163,7 +159,7 @@ def _simplify_data(source_name: str, data: dict[str, Any]) -> dict[str, Any]:
 
 
 _SYSTEM_INSTRUCTION = """Du bist der Daily Briefing Bot. Fasse die folgenden Daten in EINE
-WhatsApp-Nachricht zusammen. Die Nachricht soll informativ, freundlich
+Nachricht zusammen. Die Nachricht soll informativ, freundlich
 und auf den Punkt sein — so dass der Nutzer morgens in 5 Sekunden alles
 Wichtige erfasst hat.
 
