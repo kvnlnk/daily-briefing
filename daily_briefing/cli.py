@@ -1,10 +1,11 @@
 """CLI entry point for Daily Briefing.
 
 Usage:
-  python -m daily_briefing              # Full briefing
-  python -m daily_briefing --source weather  # Single source
-  python -m daily_briefing --json       # Raw JSON output
-  python -m daily_briefing --verbose    # Debug output
+  daily-briefing                     # Full briefing (default)
+  daily-briefing --source weather    # Single source
+  daily-briefing setup               # Interactive setup wizard
+  daily-briefing doctor              # Config diagnostics
+  daily-briefing --help              # All options
 """
 
 from __future__ import annotations
@@ -18,41 +19,95 @@ import click
 
 from daily_briefing.config import load_config
 from daily_briefing.delivery import deliver
+from daily_briefing.doctor import run_doctor
 from daily_briefing.orchestrator import fetch_all, fetch_single
+from daily_briefing.setup_wizard import run_setup
 from daily_briefing.sources.base import SourceResult
 from daily_briefing.storage.history import diff, load, save
 from daily_briefing.summarizer import get_summarizer
 from daily_briefing.summarizer.prompts import build_prompt
 
 
-@click.command()
-@click.option("--source", "-s", default=None, help="Fetch a single source (e.g. 'weather', 'github')")
+@click.group(invoke_without_command=True)
 @click.option("--config", "-c", "config_path", default=None, help="Path to brief.yaml")
+@click.option("--source", "-s", default=None, help="Fetch a single source (e.g. 'weather')")
 @click.option("--json", "json_output", is_flag=True, help="Output raw JSON instead of formatted text")
 @click.option("--verbose", "-v", is_flag=True, help="Print debug information")
 @click.option("--list-sources", is_flag=True, help="List all installed data sources")
-@click.option("--log-level", default="WARNING", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]), help="Set logging level")
-def main(source: str | None, config_path: str | None, json_output: bool, verbose: bool, log_level: str, list_sources: bool = False) -> None:
+@click.option("--lang", default=None, help="Override output language (en/de)")
+@click.option("--variant", default=None, help="Briefing variant (morning/evening/weekly)")
+@click.option("--dry-run", is_flag=True, help="Fetch sources but skip summarize + deliver")
+@click.option("--log-level", default="WARNING",
+              type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]),
+              help="Set logging level")
+@click.pass_context
+def cli(ctx: click.Context, config_path: str | None, source: str | None,
+        json_output: bool, verbose: bool, list_sources: bool,
+        lang: str | None, variant: str | None, dry_run: bool,
+        log_level: str) -> None:
     """Fetch and display your daily briefing."""
+    ctx.ensure_object(dict)
 
-    logging.basicConfig(level=getattr(logging, log_level.upper()), format="%(levelname)s:%(name)s:%(message)s")
+    logging.basicConfig(
+        level=getattr(logging, log_level.upper()),
+        format="%(levelname)s:%(name)s:%(message)s",
+    )
+
+    # Store shared state in context
+    ctx.obj["config_path"] = config_path
+    ctx.obj["source"] = source
+    ctx.obj["json_output"] = json_output
+    ctx.obj["verbose"] = verbose
+    ctx.obj["list_sources"] = list_sources
+    ctx.obj["lang"] = lang
+    ctx.obj["variant"] = variant
+    ctx.obj["dry_run"] = dry_run
+
+    # If no subcommand is invoked, run the briefing
+    if ctx.invoked_subcommand is None:
+        _run_briefing(ctx)
+
+
+@cli.command()
+@click.pass_context
+def setup(ctx: click.Context) -> None:
+    """Interactive setup wizard — creates brief.yaml and .env."""
+    config_path = ctx.obj.get("config_path")
+    run_setup(config_path=config_path)
+
+
+@cli.command()
+@click.pass_context
+def doctor(ctx: click.Context) -> None:
+    """Check configuration and credentials."""
+    config_path = ctx.obj.get("config_path")
+    run_doctor(config_path=config_path)
+
+
+# ── Core briefing logic ──────────────────────────────────────────────
+
+
+def _run_briefing(ctx: click.Context) -> None:
+    """Execute the full briefing pipeline."""
+    config_path = ctx.obj["config_path"]
+    source = ctx.obj["source"]
+    json_output = ctx.obj["json_output"]
+    verbose = ctx.obj["verbose"]
+    list_sources = ctx.obj["list_sources"]
+    lang_override = ctx.obj["lang"]
+    variant_override = ctx.obj["variant"]
+    dry_run = ctx.obj["dry_run"]
 
     # List sources mode
     if list_sources:
-        from daily_briefing.orchestrator import discover_sources
-        eps = discover_sources()
-        click.echo("Installed sources:")
-        for name in sorted(eps.keys()):
-            ep = eps[name]
-            try:
-                cls = ep.load()
-                src = cls()
-                click.echo(f"  {name:15} {'(built-in)' if name in ('weather','github','calendar','bahn','reddit','news','email') else '(third-party)'}")
-            except Exception:
-                click.echo(f"  {name:15} (failed to load)")
+        _list_sources()
         return
 
     configuration = load_config(config_path)
+
+    # Resolve lang override
+    if lang_override:
+        configuration.output.lang = lang_override
 
     # Single source mode (for testing)
     if source:
@@ -88,13 +143,26 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
         return
 
     # Build LLM prompt
-    prompt = build_prompt(results, yesterday_diff, configuration.output, lang=configuration.output.lang)
+    prompt = build_prompt(
+        results,
+        yesterday_diff,
+        configuration.output,
+        lang=lang_override or configuration.output.lang,
+        variant=variant_override or "morning",
+    )
 
     if verbose:
         click.echo("=== LLM PROMPT ===")
         click.echo(prompt)
         click.echo("=== END PROMPT ===")
         click.echo("")
+
+    # Dry-run: stop before summarizer + delivery
+    if dry_run:
+        click.echo("── Dry Run ──")
+        click.echo(f"Sources: {len(results)} fetched, {sum(1 for r in results if r.is_success())} OK")
+        click.echo("Skipping summarization + delivery (--dry-run)")
+        return
 
     # Summarize via configured provider
     provider_name = configuration.raw.get("summarizer", {}).get("provider", "prompt-only")
@@ -119,6 +187,22 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
         click.echo(prompt)
 
 
+def _list_sources() -> None:
+    """List all installed sources via entry-point discovery."""
+    from daily_briefing.orchestrator import discover_sources
+    eps = discover_sources()
+    builtin = {"weather", "github", "calendar", "bahn", "reddit", "news", "email"}
+    click.echo("Installed sources:")
+    for name in sorted(eps.keys()):
+        ep = eps[name]
+        try:
+            cls = ep.load()
+            cls()
+            click.echo(f"  {name:15} {'(built-in)' if name in builtin else '(third-party)'}")
+        except Exception:
+            click.echo(f"  {name:15} (failed to load)")
+
+
 def _print_source_result(result: SourceResult, verbose: bool) -> None:
     """Pretty-print a single source result."""
     if verbose:
@@ -137,11 +221,11 @@ def _print_source_result(result: SourceResult, verbose: bool) -> None:
 
 def _print_json(data: Any, diff_data: Any = None) -> None:
     """Print results as JSON for programmatic consumption."""
-    output = {"data": data}
+    output: dict[str, Any] = {"data": data}
     if diff_data:
         output["yesterday_diff"] = diff_data
     click.echo(json.dumps(output, ensure_ascii=False, indent=2, default=str))
 
 
 if __name__ == "__main__":
-    main()
+    cli()
