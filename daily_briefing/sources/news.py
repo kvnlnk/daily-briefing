@@ -77,7 +77,7 @@ class NewsSource(SourceProtocol):
 
     def _fetch_feed(self, url: str) -> list[dict[str, Any]]:
         """Fetch and parse a single RSS/Atom feed."""
-        headers = {"User-Agent": "DailyBriefing/1.0 (Hermes Agent; +https://github.com/kvnlnk/daily-briefing)"}
+        headers = {"User-Agent": "DailyBriefing/1.0 (+https://github.com/kvnlnk/daily-briefing)"}
         resp = requests.get(url, timeout=10, headers=headers)
         resp.raise_for_status()
         feed = feedparser.parse(resp.content)

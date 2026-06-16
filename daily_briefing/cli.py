@@ -78,7 +78,7 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
         click.echo("=== END PROMPT ===")
         click.echo("")
 
-    # Print the prompt — Hermes cron will feed this to the LLM
+    # Print the prompt (or summarized result) — the configured delivery handles sending
     click.echo(prompt)
 
 

@@ -3,10 +3,8 @@
 Free public API — no API key needed.
 Docs: https://v6.db.transport.rest/
 
-Station IDs (examples):
+Station IDs (example):
   8000105 — Frankfurt (Main) Hbf
-  8000152 — Wiesbaden Hbf
-  8098160 — Frankfurt Flughafen Fernbahnhof
 
 Configure departure/arrival stations in .env or brief.yaml.
 """

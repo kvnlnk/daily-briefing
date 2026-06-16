@@ -76,7 +76,7 @@ class RedditSource(SourceProtocol):
     def _fetch_subreddit(self, subreddit: str) -> list[dict[str, Any]]:
         """Fetch top posts from a single subreddit."""
         url = f"https://www.reddit.com/r/{subreddit}/top/.rss?t=day&limit={MAX_POSTS_PER_SUB}"
-        headers = {"User-Agent": "DailyBriefing/1.0 (Hermes Agent; +https://github.com/kvnlnk/daily-briefing)"}
+        headers = {"User-Agent": "DailyBriefing/1.0 (+https://github.com/kvnlnk/daily-briefing)"}
         resp = requests.get(url, timeout=10, headers=headers)
         resp.raise_for_status()
         feed = feedparser.parse(resp.content)
