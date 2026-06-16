@@ -176,10 +176,9 @@ body {
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 8px;
   cursor: pointer;
-  position: relative;
-  z-index: 1000;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  z-index: 10000;
 }
 
 .nav__burger-line {
@@ -555,79 +554,7 @@ body {
   transition: transform 0.3s ease, background 0.3s ease;
 }
 
-/* ── How It Works ── */
-
-.how {
-  padding: var(--space-xl) 2rem;
-  background: var(--bg-dark);
-  color: var(--cream);
-}
-
-.how .section-title {
-  color: var(--cream);
-}
-
-.how .section-subtitle {
-  color: rgba(255,255,255,0.6);
-}
-
-.how__steps {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
-  flex-wrap: wrap;
-}
-
-.step {
-  flex: 1;
-  min-width: 220px;
-  text-align: center;
-  padding: 2.5rem 1.5rem;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius-md);
-}
-
-.step__number {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  font-weight: 300;
-  color: var(--amber-glow);
-  display: block;
-  margin-bottom: 1rem;
-  line-height: 1;
-}
-
-.step__title {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-.step__desc {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.6);
-  line-height: 1.6;
-}
-
-.step__desc code {
-  font-size: 0.82rem;
-  color: var(--amber-glow);
-  background: rgba(245, 166, 35, 0.1);
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-}
-
-.step__arrow {
-  font-size: 1.5rem;
-  color: var(--amber);
-  align-self: center;
-  padding-top: 3rem;
-}
+/* ── (removed "How It Works" section — content merged into Pipeline) -- */
 
 /* ── CTA Section ── */
 
@@ -693,14 +620,13 @@ body {
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .card, .step {
+  .card {
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.6s ease, transform 0.6s ease;
   }
 
-  .card.visible,
-  .step.visible {
+  .card.visible {
     opacity: 1;
     transform: translateY(0);
   }
@@ -729,15 +655,11 @@ body {
 
   .features__grid { grid-template-columns: 1fr; }
 
-  .how__steps { flex-direction: column; align-items: center; }
-  .step__arrow { transform: rotate(90deg); padding: 0; }
-
   .section-title { margin-bottom: 0.5rem; }
   .section-subtitle {
     font-size: 0.95rem;
     margin-bottom: var(--space-lg);
   }
-  .step { padding: 1.5rem 1rem; }
 }
 
 /* ── Small Phone (≤480px) ── */
@@ -761,7 +683,6 @@ body {
   .integrations__grid { gap: 1rem; }
   .integrations__code code { font-size: 0.72rem; padding: 0.5rem 0.6rem; white-space: nowrap; }
 
-  .how { padding: var(--space-lg) 0.75rem; }
   .demo { padding: var(--space-lg) 0.75rem; }
   .extend { padding: var(--space-lg) 0.75rem; }
   .cta-section { padding: var(--space-lg) 0.75rem; }
@@ -771,8 +692,6 @@ body {
   .demo__chat { padding: 0.75rem; min-height: 260px; }
   .demo__toggles { gap: 0.4rem; }
   .demo__toggle { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
-
-  .step__arrow { padding-top: 0; }
 
   .pipeline__flow { gap: 1rem; }
   .pipeline__icons { gap: 0.3rem; }

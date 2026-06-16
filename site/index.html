@@ -28,7 +28,6 @@
       <a href="#pipeline">Pipeline</a>
       <a href="#integrations">Run It</a>
       <a href="#demo">Demo</a>
-      <a href="#how">How it Works</a>
       <a href="https://github.com/kvnlnk/daily-briefing" class="nav__cta" target="_blank">GitHub →</a>
     </div>
   </nav>
@@ -38,7 +37,6 @@
       <a href="#pipeline">Pipeline</a>
       <a href="#integrations">Run It</a>
       <a href="#demo">Demo</a>
-      <a href="#how">How it Works</a>
       <a href="https://github.com/kvnlnk/daily-briefing" class="nav__cta" target="_blank">GitHub →</a>
     </div>
   </div>
@@ -120,7 +118,7 @@
           <span class="pipeline__stage-number">01</span>
           <h3 class="pipeline__stage-title">Sources</h3>
         </div>
-        <p class="pipeline__stage-desc">Parallel fetch from all sources</p>
+        <p class="pipeline__stage-desc">Parallel fetch from all sources via ThreadPoolExecutor</p>
         <div class="pipeline__icons pipeline__icons--sources" id="pipelineSources">
           <span class="pipeline__icon" data-icon="weather">☀️</span>
           <span class="pipeline__icon" data-icon="calendar">📅</span>
@@ -152,7 +150,7 @@
           <span class="pipeline__stage-number">03</span>
           <h3 class="pipeline__stage-title">Summarize</h3>
         </div>
-        <p class="pipeline__stage-desc">LLM processes the prompt</p>
+        <p class="pipeline__stage-desc">LLM processes the prompt — any model you choose</p>
         <div class="pipeline__icons pipeline__icons--summarize" id="pipelineSummarize">
           <div class="pipeline__spinner"></div>
           <span class="pipeline__summarize-label">LLM summarizes…</span>
@@ -261,32 +259,6 @@
             <span class="demo__typing" id="demoTyping">⏳</span>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="how" class="how">
-    <h2 class="section-title">How It Works</h2>
-    <div class="how__steps">
-      <div class="step">
-        <span class="step__number">01</span>
-        <h3 class="step__title">Parallel Fetch</h3>
-        <p class="step__desc">All 7 sources are fetched concurrently via <code>ThreadPoolExecutor</code>. One slow source never blocks the rest.</p>
-      </div>
-      <div class="step__arrow">→</div>
-      <div class="step">
-        <span class="step__number">02</span>
-        <h3 class="step__title">LLM Summarizes</h3>
-        <p class="step__desc">A structured prompt is built from all source data plus yesterday's comparison — then fed to any LLM you choose.</p>
-      </div>
-      <div class="step__arrow">→</div>
-      <div class="step">
-        <span class="step__number">03</span>
-        <h3 class="step__title">Pluggable Delivery</h3>
-        <p class="step__desc">
-          The summarized briefing is sent via stdout, ntfy push, email, or any
-          configured delivery method — no external scheduler required.
-        </p>
       </div>
     </div>
   </section>

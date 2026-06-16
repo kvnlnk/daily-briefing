@@ -147,7 +147,7 @@ function animatePipeline() {
 /* ── Intersection Observer for scroll reveals ── */
 
 function setupRevealAnimations() {
-  const cards = document.querySelectorAll('.card, .step');
+  const cards = document.querySelectorAll('.card');
   if (cards.length === 0) return;
 
   const observer = new IntersectionObserver(
@@ -276,13 +276,11 @@ document.addEventListener('DOMContentLoaded', () => {
       burger.setAttribute('aria-expanded', isOpen);
       overlay.setAttribute('aria-hidden', !isOpen);
     });
-    // Close menu when a link is tapped
-    overlay.addEventListener('click', (e) => {
-      if (e.target.closest('a')) {
-        overlay.classList.remove('visible');
-        burger.setAttribute('aria-expanded', 'false');
-        overlay.setAttribute('aria-hidden', 'true');
-      }
+    // Close menu on any overlay tap (link or background)
+    overlay.addEventListener('click', () => {
+      overlay.classList.remove('visible');
+      burger.setAttribute('aria-expanded', 'false');
+      overlay.setAttribute('aria-hidden', 'true');
     });
   }
 });
