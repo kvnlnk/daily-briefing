@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "daily-briefing"
@@ -15,10 +15,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+calendar = ["google-api-python-client>=2.0"]
 dev = [
     "pytest>=7",
     "pytest-cov>=4",
     "ruff>=0.1",
+    "daily-briefing[calendar]",
 ]
 
 [tool.setuptools.packages.find]

@@ -82,6 +82,36 @@ class TestDiff:
         result = diff(today, yesterday)
         assert result == {}
 
+    def test_multi_location_weather_diff(self):
+        """Multi-location weather data should produce per-location diff."""
+        today = {
+            "weather": {
+                "locations": {
+                    "Verden (Aller)": {"temperature": 20.0},
+                    "Rethem (Aller)": {"temperature": 18.0},
+                }
+            }
+        }
+        yesterday = {
+            "weather": {
+                "locations": {
+                    "Verden (Aller)": {"temperature": 15.0},
+                    "Rethem (Aller)": {"temperature": 16.0},
+                }
+            }
+        }
+        result = diff(today, yesterday)
+        assert "weather" in result, "BUG: Multi-location diff returns empty"
+        assert result["weather"]["locations"]["Verden (Aller)"]["temperature_diff"] == 5.0
+        assert result["weather"]["locations"]["Rethem (Aller)"]["temperature_diff"] == 2.0
+
+    def test_multi_location_weather_diff_with_single_location_fallback(self):
+        """Single-location data (top-level temperature) still works after multi-location fix."""
+        today = {"weather": {"temperature": 20.0}}
+        yesterday = {"weather": {"temperature": 15.0}}
+        result = diff(today, yesterday)
+        assert result["weather"]["temperature_diff"] == 5.0
+
     def test_github_diff(self):
         today = {"github": {"total_issues": 5, "total_prs": 3}}
         yesterday = {"github": {"total_issues": 3, "total_prs": 1}}

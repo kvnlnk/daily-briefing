@@ -33,3 +33,4 @@ histfile
 # Site (Vite build output)
 site/dist/
 site/node_modules/
+.worktrees/

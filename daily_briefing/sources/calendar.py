@@ -18,11 +18,18 @@ import datetime
 import os
 import sys
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
 # Timezone for date boundary calculation (user's local timezone)
-DEFAULT_TZ = os.environ.get("TZ", "Europe/Berlin")
+TZ_BERLIN = ZoneInfo("Europe/Berlin")
+
+
+def today_start_in_tz(now: datetime.datetime, tz: ZoneInfo) -> datetime.datetime:
+    """Return midnight today in the given timezone."""
+    today_date = now.astimezone(tz).date()
+    return datetime.datetime.combine(today_date, datetime.time.min, tzinfo=tz)
 
 
 class CalendarSource(SourceProtocol):
@@ -47,7 +54,7 @@ class CalendarSource(SourceProtocol):
             return SourceResult(
                 name=self.name,
                 priority=20,
-                error="google-api-python-client not installed. Run: pip install google-api-python-client",
+                error="google-api-python-client not installed. Run: pip install 'daily-briefing[calendar]'",
             )
         except Exception as e:
             error_msg = str(e)
@@ -75,11 +82,7 @@ class CalendarSource(SourceProtocol):
 
         # Time range: midnight to midnight in user's timezone
         now = datetime.datetime.now(datetime.timezone.utc)
-        today_start = datetime.datetime.combine(
-            now.astimezone(datetime.timezone(datetime.timedelta(hours=2))).date(),
-            datetime.time.min,
-            tzinfo=datetime.timezone(datetime.timedelta(hours=2)),
-        )
+        today_start = today_start_in_tz(now, TZ_BERLIN)
         today_end = today_start + datetime.timedelta(days=1)
 
         events_result = (
