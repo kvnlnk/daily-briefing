@@ -37,4 +37,5 @@ brief.yaml
 site/dist/
 site/node_modules/
 site-dist/
+examples/*/src/*.egg-info/
 .worktrees/

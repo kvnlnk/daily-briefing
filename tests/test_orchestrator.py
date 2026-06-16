@@ -4,6 +4,22 @@ from daily_briefing.orchestrator import fetch_all, fetch_single
 from daily_briefing.config import BriefingConfig, SourceConfig
 
 
+class TestSourceDiscovery:
+    def test_discover_sources_finds_builtin(self):
+        from daily_briefing.orchestrator import discover_sources
+        eps = discover_sources()
+        assert "weather" in eps
+        assert "github" in eps
+        assert len(eps) >= 7
+
+    def test_entry_point_loads_weather(self):
+        from daily_briefing.orchestrator import discover_sources
+        eps = discover_sources()
+        cls = eps["weather"].load()
+        src = cls()
+        assert src.name == "weather"
+
+
 class TestOrchestrator:
     def test_no_enabled_sources_returns_empty(self):
         cfg = BriefingConfig(sources={}, raw={"sources": {}})
