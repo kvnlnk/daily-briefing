@@ -70,9 +70,10 @@ class RedditSource(SourceProtocol):
     def _fetch_subreddit(self, subreddit: str) -> list[dict[str, Any]]:
         """Fetch top posts from a single subreddit."""
         url = f"https://www.reddit.com/r/{subreddit}/top/.rss?t=day&limit={MAX_POSTS_PER_SUB}"
-        # Reddit RSS sometimes returns HTML error pages with 200 status.
-        # feedparser handles this gracefully — bozo flag will be set.
-        feed = feedparser.parse(url)  # Uses requests internally
+        headers = {"User-Agent": "DailyBriefing/1.0 (Hermes Agent; +https://github.com/kvnlnk/daily-briefing)"}
+        resp = requests.get(url, timeout=10, headers=headers)
+        resp.raise_for_status()
+        feed = feedparser.parse(resp.content)
 
         if feed.bozo and not feed.entries:
             raise RuntimeError(f"Feed parse error: {feed.bozo_exception}")

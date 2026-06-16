@@ -13,6 +13,7 @@ from collections import OrderedDict
 from typing import Any
 
 import feedparser
+import requests
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
@@ -75,7 +76,10 @@ class NewsSource(SourceProtocol):
 
     def _fetch_feed(self, url: str) -> list[dict[str, Any]]:
         """Fetch and parse a single RSS/Atom feed."""
-        feed = feedparser.parse(url)
+        headers = {"User-Agent": "DailyBriefing/1.0 (Hermes Agent; +https://github.com/kvnlnk/daily-briefing)"}
+        resp = requests.get(url, timeout=10, headers=headers)
+        resp.raise_for_status()
+        feed = feedparser.parse(resp.content)
 
         if feed.bozo and not feed.entries:
             raise RuntimeError(f"Feed parse error: {feed.bozo_exception}")
