@@ -101,11 +101,16 @@ def _simplify_data(source_name: str, data: dict[str, Any]) -> dict[str, Any]:
     simplified = {}
 
     if source_name == "weather":
-        for key in ("location", "temperature", "feels_like", "humidity",
-                     "wind_speed", "precipitation", "condition", "emoji",
-                     "high", "low", "rain_chance"):
-            if key in data:
-                simplified[key] = data[key]
+        # Single location
+        if "location" in data:
+            for key in ("location", "temperature", "feels_like", "humidity",
+                         "wind_speed", "precipitation", "condition", "emoji",
+                         "high", "low", "rain_chance"):
+                if key in data:
+                    simplified[key] = data[key]
+        # Multiple locations
+        elif "locations" in data:
+            simplified["locations"] = data["locations"]
 
     elif source_name == "calendar":
         simplified["total_events"] = data.get("total", 0)

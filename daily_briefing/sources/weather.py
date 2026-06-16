@@ -46,7 +46,7 @@ WEATHER_MAP: dict[int, tuple[str, str]] = {
     99: ("Thunderstorm with heavy hail", "⛈️"),
 }
 
-# Default location: Frankfurt (user configures via .env)
+# Default single location (fallback if no locations in brief.yaml)
 DEFAULT_LAT = float(os.environ.get("WEATHER_LAT", "50.1109"))
 DEFAULT_LON = float(os.environ.get("WEATHER_LON", "8.6821"))
 DEFAULT_NAME = os.environ.get("WEATHER_NAME", "Frankfurt")
@@ -58,13 +58,30 @@ class WeatherSource(SourceProtocol):
     name = "weather"
 
     def fetch(self, config: dict[str, Any]) -> SourceResult:
-        """Fetch current conditions + today's forecast."""
+        """Fetch current conditions + today's forecast for configured locations."""
         try:
-            data = self._call_api()
+            # Read locations from brief.yaml or use default
+            weather_cfg = config.get("sources", {}).get("weather", {})
+            locations = weather_cfg.get("locations", [])
+
+            if not locations:
+                # Fallback to single env-var location
+                data = self._fetch_one(DEFAULT_LAT, DEFAULT_LON, DEFAULT_NAME)
+                return SourceResult(name=self.name, priority=10, data=data)
+
+            # Fetch all locations
+            all_data = {}
+            for loc in locations:
+                lat = loc.get("lat")
+                lon = loc.get("lon")
+                name = loc.get("name", "Unknown")
+                if lat is not None and lon is not None:
+                    all_data[name] = self._fetch_one(float(lat), float(lon), name)
+
             return SourceResult(
                 name=self.name,
                 priority=10,
-                data=data,
+                data={"locations": all_data},
             )
         except requests.RequestException as e:
             return SourceResult(
@@ -79,11 +96,11 @@ class WeatherSource(SourceProtocol):
                 error=f"Weather data parse error: {e}",
             )
 
-    def _call_api(self) -> dict[str, Any]:
-        """Call Open-Meteo and parse the response into our format."""
+    def _fetch_one(self, lat: float, lon: float, name: str) -> dict[str, Any]:
+        """Fetch weather for a single location."""
         params = {
-            "latitude": DEFAULT_LAT,
-            "longitude": DEFAULT_LON,
+            "latitude": lat,
+            "longitude": lon,
             "current": "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation",
             "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
             "timezone": "Europe/Berlin",
@@ -104,7 +121,7 @@ class WeatherSource(SourceProtocol):
         condition, emoji = WEATHER_MAP.get(weather_code, ("Unknown", "❓"))
 
         return {
-            "location": DEFAULT_NAME,
+            "location": name,
             "temperature": current.get("temperature_2m"),
             "feels_like": current.get("apparent_temperature"),
             "humidity": current.get("relative_humidity_2m"),
