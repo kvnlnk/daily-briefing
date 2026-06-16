@@ -425,9 +425,9 @@ body {
   background: white;
   border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
   padding: 0.75rem 1rem;
-  max-width: 260px;
-  font-size: 0.82rem;
-  line-height: 1.5;
+  max-width: min(340px, 82%);
+  font-size: 0.85rem;
+  line-height: 1.55;
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   position: relative;
 }
@@ -688,7 +688,6 @@ body {
   .cta-section { padding: var(--space-lg) 0.75rem; }
 
   .demo__phone { width: 100%; }
-  .demo__bubble { max-width: 220px; font-size: 0.8rem; }
   .demo__chat { padding: 0.75rem; min-height: 260px; }
   .demo__toggles { gap: 0.4rem; }
   .demo__toggle { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
@@ -706,8 +705,6 @@ body {
   .hero__title { font-size: clamp(1.8rem, 9vw, 2.4rem); }
   .hero__label { font-size: 0.7rem; }
   .btn { font-size: 0.85rem; padding: 0.7rem 1.5rem; }
-
-  .demo__bubble { max-width: 180px; font-size: 0.76rem; }
 }
 
 /* ── Extend / Plugin Section ── */
