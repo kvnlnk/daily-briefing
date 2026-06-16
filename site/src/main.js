@@ -58,12 +58,16 @@ function typeMessage(element, text, speed = 12) {
 /* ── Pipeline animation orchestration ── */
 
 let pipelineTimeout = null;
-let pipelineLoopTimeout = null;
+let pipelineAnimationActive = false;
 
 function animatePipeline() {
   const stages = document.querySelectorAll('.pipeline__stage');
   const arrows = document.querySelectorAll('.pipeline__arrow');
   const all = [];
+
+  // Don't restart if already playing
+  if (pipelineAnimationActive) return;
+  pipelineAnimationActive = true;
 
   // Interleave stages and arrows: stage0, arrow0, stage1, arrow1, ...
   stages.forEach((s, i) => {
@@ -82,14 +86,9 @@ function animatePipeline() {
     });
   });
 
-  // Clear any running timeouts
   if (pipelineTimeout) {
     clearTimeout(pipelineTimeout);
     pipelineTimeout = null;
-  }
-  if (pipelineLoopTimeout) {
-    clearTimeout(pipelineLoopTimeout);
-    pipelineLoopTimeout = null;
   }
 
   let delay = 0;
@@ -116,34 +115,17 @@ function animatePipeline() {
     }
   });
 
-  // After all stages have appeared, wait and then trigger phone typing
+  // After all stages have appeared, show the phone typing but DON'T auto-scroll
   const totalDuration = (stages.length * 2 - 1) * STAGE_DELAY / 2 + STAGE_DELAY;
-  pipelineLoopTimeout = setTimeout(() => {
-    // Scroll demo into view and start typing
-    const demoSection = document.getElementById('demo');
-    if (demoSection) {
-      demoSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    // Start the existing phone typing
+  setTimeout(() => {
     const demoContent = document.getElementById('demoContent');
     if (demoContent) {
-      // Check if language toggle is already set
       const activeToggle = document.querySelector('.demo__toggle--active');
       const lang = activeToggle ? activeToggle.dataset.lang : 'en';
       const text = lang === 'de' ? BRIEFING_DE : BRIEFING_EN;
-      // Small delay for scroll
       setTimeout(() => typeMessage(demoContent, text), 600);
     }
-
-    // Schedule auto-loop: after typing finishes (~8s) + idle buffer, replay pipeline
-    pipelineLoopTimeout = setTimeout(() => {
-      // Scroll back to pipeline
-      const pipelineSection = document.getElementById('pipeline');
-      if (pipelineSection) {
-        pipelineSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      setTimeout(animatePipeline, 800);
-    }, 10000);
+    pipelineAnimationActive = false; // allow replay
   }, totalDuration + 500);
 }
 
@@ -199,10 +181,7 @@ function setupReplayButton() {
   if (!replayBtn) return;
 
   replayBtn.addEventListener('click', () => {
-    if (pipelineLoopTimeout) {
-      clearTimeout(pipelineLoopTimeout);
-      pipelineLoopTimeout = null;
-    }
+    pipelineAnimationActive = false;
     animatePipeline();
   });
 }
