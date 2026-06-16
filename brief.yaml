@@ -39,7 +39,4 @@ output:
   emoji: true            # Include emoji in output
   timezone: Europe/Berlin
 
-# Delivery (used by Hermes cron integration)
-delivery:
-  platform: whatsapp     # whatsapp | telegram | local
-  time: "06:30"          # When to send (in timezone above)
+

@@ -15,10 +15,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+calendar = ["google-api-python-client>=2.0"]
 dev = [
     "pytest>=7",
     "pytest-cov>=4",
     "ruff>=0.1",
+    "daily-briefing[calendar]",
 ]
 
 [tool.setuptools.packages.find]

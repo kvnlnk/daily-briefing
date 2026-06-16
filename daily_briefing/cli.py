@@ -55,9 +55,11 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
 
     # Load yesterday for comparison
     from datetime import date, timedelta
-    today_data = load()
-    yesterday_data = load((date.today() - timedelta(days=1)).isoformat())
-    yesterday_diff = diff(today_data, yesterday_data) if yesterday_data else None
+    yesterday_diff = None
+    if configuration.output.include_diff:
+        today_data = load()
+        yesterday_data = load((date.today() - timedelta(days=1)).isoformat())
+        yesterday_diff = diff(today_data, yesterday_data) if yesterday_data else None
 
     if json_output:
         _print_json(results, yesterday_diff)

@@ -31,7 +31,6 @@ This project was built entirely through natural language conversations with [Her
 |---|---|
 | Language | Python 3.11 |
 | CLI framework | [`click`](https://click.palletsprojects.com/) 8.3 |
-| Terminal output | [`rich`](https://rich.readthedocs.io/) 14.3 |
 | HTTP client | [`requests`](https://requests.readthedocs.io/) 2.33 |
 | Config | YAML via [`PyYAML`](https://pyyaml.org/) 6.0 |
 | Calendar SDK | [`google-api-python-client`](https://github.com/googleapis/google-api-python-client) |

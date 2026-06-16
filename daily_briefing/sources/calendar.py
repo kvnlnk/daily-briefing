@@ -54,7 +54,7 @@ class CalendarSource(SourceProtocol):
             return SourceResult(
                 name=self.name,
                 priority=20,
-                error="google-api-python-client not installed. Run: pip install google-api-python-client",
+                error="google-api-python-client not installed. Run: pip install 'daily-briefing[calendar]'",
             )
         except Exception as e:
             error_msg = str(e)
