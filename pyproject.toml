@@ -38,6 +38,9 @@ reddit = "daily_briefing.sources.reddit:RedditSource"
 news = "daily_briefing.sources.news:NewsSource"
 email = "daily_briefing.sources.email:EmailSource"
 
+[project.scripts]
+daily-briefing = "daily_briefing.cli:cli"
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
