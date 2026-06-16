@@ -20,6 +20,7 @@ from daily_briefing.config import load_config
 from daily_briefing.orchestrator import fetch_all, fetch_single
 from daily_briefing.sources.base import SourceResult
 from daily_briefing.storage.history import diff, load, save
+from daily_briefing.summarizer import get_summarizer
 from daily_briefing.summarizer.prompts import build_prompt
 
 
@@ -94,8 +95,21 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
         click.echo("=== END PROMPT ===")
         click.echo("")
 
-    # Print the prompt (or summarized result) — the configured delivery handles sending
-    click.echo(prompt)
+    # Summarize via configured provider
+    provider_name = configuration.raw.get("summarizer", {}).get("provider", "prompt-only")
+    try:
+        summarizer = get_summarizer(provider_name)
+        summary = summarizer.summarize(prompt)
+
+        if summary.is_success():
+            click.echo(summary.text)
+        else:
+            click.echo(f"Summarizer error ({provider_name}): {summary.error}", err=True)
+            click.echo("")  # Fallback: print the raw prompt
+            click.echo(prompt)
+    except ValueError as e:
+        click.echo(f"Configuration error: {e}", err=True)
+        click.echo(prompt)
 
 
 def _print_source_result(result: SourceResult, verbose: bool) -> None:
