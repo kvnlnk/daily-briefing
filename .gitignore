@@ -40,6 +40,7 @@ docs/superpowers/
 site/dist/
 site/node_modules/
 site-dist/
+site/.vercel/
 examples/*/src/*.egg-info/
 .worktrees/
 .vercel/
