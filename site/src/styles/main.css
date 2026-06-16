@@ -40,6 +40,8 @@
   --space-lg:  2.5rem;
   --space-xl:  5rem;
 
+  /* Breakpoints (used conceptually — actual media queries use hard px for compat) */
+
   /* Border radius */
   --radius-sm: 8px;
   --radius-md: 16px;
@@ -57,6 +59,9 @@ body {
   background: var(--bg-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  font-size: 16px; /* prevent iOS Safari zoom on inputs */
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
 }
 
 /* ── Navigation ── */
@@ -113,6 +118,44 @@ body {
 .nav__cta:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 20px rgba(212, 120, 10, 0.4);
+}
+
+/* ── Burger Menu Button (mobile only) ── */
+
+.nav__burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 101;
+  touch-action: manipulation;
+}
+
+.nav__burger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--cream);
+  border-radius: 1px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Burger open state — X animation */
+.nav--open .nav__burger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav--open .nav__burger-line:nth-child(2) {
+  opacity: 0;
+}
+.nav--open .nav__burger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 /* ── Hero ── */
@@ -586,33 +629,107 @@ body {
   }
 }
 
-/* ── Responsive ── */
+/* ═══════════════════════════════════════════
+   Responsive — Mobile-first, 3 breakpoints
+   Note: Existing base styles are desktop (1024+).
+   These queries progressively shrink for smaller screens.
+   ═══════════════════════════════════════════ */
+
+/* ── Tablet (≤768px) ── */
 
 @media (max-width: 768px) {
-  .nav { padding: 0.75rem 1rem; }
-  .nav__link--mobile-hidden { display: none; }
+  .nav { padding: 0.75rem 1.25rem; }
+
+  /* Show burger, hide links by default */
+  .nav__burger { display: flex; }
+  .nav__links {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    background: rgba(11, 13, 26, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+  }
+  .nav__links a {
+    font-size: 1.2rem;
+    padding: 0.5rem 0;
+  }
+  .nav--open .nav__links {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
   .hero { padding: 5rem 1.25rem 3rem; }
-
   .hero__actions { flex-direction: column; align-items: center; }
 
-  .features__grid {
-    grid-template-columns: 1fr;
-  }
+  .features__grid { grid-template-columns: 1fr; }
 
-  .how__steps {
-    flex-direction: column;
-    align-items: center;
-  }
+  .how__steps { flex-direction: column; align-items: center; }
+  .step__arrow { transform: rotate(90deg); padding: 0; }
 
-  .step__arrow {
-    transform: rotate(90deg);
-    padding: 0;
+  .section-title { margin-bottom: 0.5rem; }
+  .section-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: var(--space-lg);
   }
+  .step { padding: 1.5rem 1rem; }
 }
 
-@media (max-width: 400px) {
+/* ── Small Phone (≤480px) ── */
+
+@media (max-width: 480px) {
+  .nav { padding: 0.6rem 0.75rem; }
+  .nav__logo { font-size: 1.05rem; }
+
+  .hero { padding: 4rem 0.75rem 2.5rem; }
+  .hero__title { font-size: clamp(2rem, 10vw, 2.8rem); }
+  .hero__subtitle br { display: none; }
+
+  .features { padding: var(--space-lg) 0.75rem; }
+  .features__grid { gap: 1rem; }
+  .card { padding: 1.25rem; }
+
+  .pipeline { padding: var(--space-lg) 0.75rem; }
+  .pipeline__stage { padding: 1rem 0.75rem; }
+
+  .integrations { padding: var(--space-lg) 0.75rem; }
+  .integrations__grid { gap: 1rem; }
+  .integrations__code code { font-size: 0.72rem; padding: 0.5rem 0.6rem; white-space: nowrap; }
+
+  .how { padding: var(--space-lg) 0.75rem; }
+  .demo { padding: var(--space-lg) 0.75rem; }
+  .extend { padding: var(--space-lg) 0.75rem; }
+  .cta-section { padding: var(--space-lg) 0.75rem; }
+
   .demo__phone { width: 100%; }
+  .demo__bubble { max-width: 220px; font-size: 0.8rem; }
+  .demo__chat { padding: 0.75rem; min-height: 260px; }
+  .demo__toggles { gap: 0.4rem; }
+  .demo__toggle { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+
+  .step__arrow { padding-top: 0; }
+
+  .pipeline__flow { gap: 1rem; }
+  .pipeline__icons { gap: 0.3rem; }
+}
+
+/* ── Tiny Phone (≤375px, iPhone SE) ── */
+
+@media (max-width: 375px) {
+  .nav__logo { font-size: 0.95rem; }
+  .nav__links a { font-size: 1.1rem; }
+
+  .hero__title { font-size: clamp(1.8rem, 9vw, 2.4rem); }
+  .hero__label { font-size: 0.7rem; }
+  .btn { font-size: 0.85rem; padding: 0.7rem 1.5rem; }
+
+  .demo__bubble { max-width: 180px; font-size: 0.76rem; }
 }
 
 /* ── Extend / Plugin Section ── */
@@ -915,6 +1032,18 @@ body {
 }
 
 /* ── Pipeline responsive ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .pipeline__stage { opacity: 1; transform: none; }
+  .pipeline__arrow { opacity: 1; }
+  .pipeline__icon { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .pipeline__spinner { animation: none; }
+  .pipeline__done-check { animation: none; }
+  .pipeline__prompt-badge { animation: none; opacity: 1; }
+  .pipeline__assemble-arrow { animation: none; opacity: 1; }
+  .pipeline__summarize-label { animation: none; opacity: 1; }
+  .pipeline__replay { display: none; }
+}
 
 @media (max-width: 900px) {
   .pipeline__stage {

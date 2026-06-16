@@ -16,14 +16,19 @@
   <script type="module" src="/src/main.js"></script>
 </head>
 <body>
-  <nav class="nav">
+  <nav class="nav" id="nav">
     <span class="nav__logo">🌅 daily-briefing</span>
-    <div class="nav__links">
+    <button class="nav__burger" id="navBurger" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span class="nav__burger-line"></span>
+      <span class="nav__burger-line"></span>
+      <span class="nav__burger-line"></span>
+    </button>
+    <div class="nav__links" id="navLinks">
       <a href="#features">Features</a>
       <a href="#pipeline">Pipeline</a>
       <a href="#integrations">Run It</a>
       <a href="#demo">Demo</a>
-      <a href="#how" class="nav__link--mobile-hidden">How it Works</a>
+      <a href="#how">How it Works</a>
       <a href="https://github.com/kvnlnk/daily-briefing" class="nav__cta" target="_blank">GitHub →</a>
     </div>
   </nav>

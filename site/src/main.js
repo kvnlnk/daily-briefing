@@ -235,4 +235,21 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLanguageToggle();
   setupPipelineTrigger();
   setupReplayButton();
+
+  /* ── Burger menu toggle ── */
+  const nav = document.getElementById('nav');
+  const burger = document.getElementById('navBurger');
+  const navLinks = document.getElementById('navLinks');
+  if (burger && nav && navLinks) {
+    burger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = nav.classList.toggle('nav--open');
+      burger.setAttribute('aria-expanded', isOpen);
+    });
+    // Close menu when a link is tapped
+    navLinks.addEventListener('click', () => {
+      nav.classList.remove('nav--open');
+      burger.setAttribute('aria-expanded', 'false');
+    });
+  }
 });
