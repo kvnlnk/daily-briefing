@@ -1,25 +1,40 @@
-/* ── Scroll reveal + WhatsApp typing animation ── */
+/* ── Scroll reveal + typing animation ── */
 
 import './styles/main.css';
 
-const BRIEFING_TEXT = `☀🌅 Guten Morgen!
+const BRIEFING_EN = `🌅 Good morning!
 
-Frankfurt: 18°C, ⛅ teils bewölkt — Höchstwert 20°C, Tiefstwert 13°C. 60% Regenrisiko.
+London: 18°C, ⛅ partly cloudy — High 20°C, Low 13°C. 60% rain chance.
 
-📅 Heute: 2 Termine — Sprint-Review (10:30) + Mittagessen mit Team (12:30).
+📅 Today: 2 events — Sprint Review (10:30) + Team Lunch (12:30).
 
-🐙 GitHub: 1 offener PR (Update filter logic), 1 Issue assigned. 3 Repos aktiv: glitch, glitch-site, snapshot-cli.
+🐙 GitHub: 1 open PR, 1 assigned issue.
 
-📰 Top-News: Intel „Raptor Lake Next" — DDR4 und angeblich Anfang 2027 fertig. VW setzt auf die Telekom: T-Systems baut weltweite Cloud.
+📰 Top News: Tech giants announce new AI chip partnership. Open-source framework reaches 100K stars.
+
+Have a great day! ☕`;
+
+const BRIEFING_DE = `🌅 Guten Morgen!
+
+Berlin: 18°C, ⛅ teils bewölkt — Höchstwert 20°C, Tiefstwert 13°C. 60% Regenrisiko.
+
+📅 Heute: 2 Termine — Sprint-Review (10:30) + Mittagessen (12:30).
+
+🐙 GitHub: 1 offener PR, 1 Issue zugewiesen.
+
+📰 Top-News: Tech-Giganten kündigen neue KI-Chip-Partnerschaft an. Open-Source-Framework erreicht 100.000 Sterne.
 
 Schönen Tag! ☕`;
 
-/* ── WhatsApp typing effect ── */
+/* ── Typing effect ── */
 
 function typeMessage(element, text, speed = 12) {
   const typingIndicator = document.getElementById('demoTyping');
   let index = 0;
   let result = '';
+
+  // Reset display
+  if (typingIndicator) typingIndicator.style.display = 'inline-block';
 
   // Hide typing indicator after a moment
   setTimeout(() => {
@@ -61,12 +76,30 @@ function setupRevealAnimations() {
   cards.forEach((card) => observer.observe(card));
 }
 
+/* ── Language toggle ── */
+
+function setupLanguageToggle() {
+  const demoContent = document.getElementById('demoContent');
+  if (!demoContent) return;
+
+  document.querySelectorAll('.demo__toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.demo__toggle').forEach(b => b.classList.remove('demo__toggle--active'));
+      btn.classList.add('demo__toggle--active');
+      const lang = btn.dataset.lang;
+      const text = lang === 'de' ? BRIEFING_DE : BRIEFING_EN;
+      typeMessage(demoContent, text);
+    });
+  });
+}
+
 /* ── Smooth nav scroll (no-JS fallback via CSS already) ── */
 
 document.addEventListener('DOMContentLoaded', () => {
   const demoContent = document.getElementById('demoContent');
   if (demoContent) {
-    typeMessage(demoContent, BRIEFING_TEXT);
+    typeMessage(demoContent, BRIEFING_EN);
   }
   setupRevealAnimations();
+  setupLanguageToggle();
 });

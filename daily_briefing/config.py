@@ -40,6 +40,7 @@ class OutputConfig:
     tone: str = "friendly"
     emoji: bool = True
     timezone: str = "Europe/Berlin"
+    lang: str = "en"
 
 
 @dataclass
@@ -95,6 +96,7 @@ def load_config(path: Path | str | None = None) -> BriefingConfig:
         tone=output_raw.get("tone", "friendly"),
         emoji=output_raw.get("emoji", True),
         timezone=output_raw.get("timezone", "Europe/Berlin"),
+        lang=output_raw.get("lang", "en"),
     )
 
     return BriefingConfig(sources=sources, output=output, raw=raw)

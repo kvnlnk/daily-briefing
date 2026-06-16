@@ -1,0 +1,36 @@
+# English locale for Daily Briefing
+# Used when output.lang is "en" or when locale file is not found
+
+system_instruction: |
+  You are the Daily Briefing Bot. Summarize the following data into ONE
+  concise message. The message should be informative, friendly, and to
+  the point — so the user catches everything important in 5 seconds.
+
+  Priority: Weather > Calendar > GitHub > Transit > News > Reddit.
+  Mention failed sources briefly (e.g. "Commute data not available today").
+
+format:
+  header: "TODAY'S DATA"
+  output: "OUTPUT FORMAT"
+  max_chars: "Maximum {max_length} characters"
+  tone: "Tone: {tone}"
+  emoji_on: "Use emoji where appropriate"
+  emoji_off: "No emoji"
+  structure: "Structure: Header → Weather → Calendar → GitHub → Transit → News → Reddit → Sign-off"
+  no_bullets: "No bullet points or lists — flowing paragraph text"
+  mention_errors: "Mention failed sources briefly (e.g. 'Commute data not available today')"
+  generate: "Generate the message NOW:"
+  yesterday: "COMPARISON WITH YESTERDAY:"
+  error_prefix: "NOT AVAILABLE"
+
+diff:
+  note_label: "  {source}: changes"
+
+source_labels:
+  weather: "WEATHER"
+  calendar: "CALENDAR"
+  github: "GITHUB"
+  bahn: "TRANSIT"
+  reddit: "REDDIT"
+  news: "NEWS"
+  email: "EMAIL"

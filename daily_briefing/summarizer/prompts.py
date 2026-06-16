@@ -1,31 +1,37 @@
 """Prompt templates and formatting for LLM summarization.
 
-This module builds the prompt that the configured LLM uses to
-generate the final briefing message. The prompt includes:
+Builds prompts using locale files (en.yaml, de.yaml) so the output
+language matches the user's configured output.lang setting.
 """
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
-from daily_briefing.config import BriefingConfig, OutputConfig
+from daily_briefing.config import OutputConfig
 from daily_briefing.sources.base import SourceResult
+from daily_briefing.summarizer.locales import load_locale
 
 
 def build_prompt(
     results: list[SourceResult],
     yesterday_diff: dict[str, Any] | None = None,
     config: OutputConfig | None = None,
+    lang: str | None = None,
+    variant: str = "morning",
 ) -> str:
     """Build the LLM prompt from fetched data and config.
 
-    The prompt is structured so the LLM can produce a concise,
-    briefing-friendly message.
+    The prompt is constructed using locale strings so the output
+    language matches the user's config.
 
     Args:
         results: All fetched SourceResults (including errors).
         yesterday_diff: Optional diff from storage.history.diff().
-        config: Output preferences (max_length, emoji, tone).
+        config: Output preferences (max_length, emoji, tone, lang).
+        lang: Language code ('en', 'de'). Overrides config.output.lang.
+        variant: Prompt variant ('morning', 'evening', 'weekly').
 
     Returns:
         A prompt string ready for the LLM.
@@ -33,58 +39,62 @@ def build_prompt(
     if config is None:
         config = OutputConfig()
 
-    parts = [_SYSTEM_INSTRUCTION]
+    # Resolve language: explicit param > config > default
+    resolved_lang = lang or getattr(config, "lang", "en") or "en"
+    loc = load_locale(resolved_lang)
+
+    parts = [loc["system_instruction"]]
 
     # Add yesterday context if available
     if yesterday_diff:
-        parts.append(format_diff_section(yesterday_diff))
+        parts.append(_format_diff_section(yesterday_diff, loc))
 
     # Add source data
     parts.append("---")
-    parts.append("HEUTIGE DATEN:")
+    parts.append(loc["format"]["header"])
     parts.append("")
 
     for i, result in enumerate(results, 1):
-        parts.append(format_source_section(i, result))
+        parts.append(_format_source_section(i, result, loc))
 
     # Add output constraints
     parts.append("---")
-    parts.append("AUSGABE-FORMAT:")
-    parts.append(f"- Maximal {config.max_length} Zeichen")
-    parts.append(f"- Ton: {config.tone}")
+    parts.append(loc["format"]["output"])
+    parts.append(f"- {loc['format']['max_chars'].format(max_length=config.max_length)}")
+    parts.append(f"- {loc['format']['tone'].format(tone=config.tone)}")
     if config.emoji:
-        parts.append("- Verwende Emoji wo passend")
+        parts.append(f"- {loc['format']['emoji_on']}")
     else:
-        parts.append("- Keine Emoji")
-    parts.append("- Struktur: HEADER → Wetter → Termine → GitHub → Bahn → News → Reddit → SIGN-OFF")
-    parts.append("- Keine Bullet-Points oder Aufzählungen — ein Fließtext")
-    parts.append("- Erwähne fehlerhafte Quellen kurz (z.B. 'Bahn-Daten heute nicht verfügbar')")
+        parts.append(f"- {loc['format']['emoji_off']}")
+    parts.append(f"- {loc['format']['structure']}")
+    parts.append(f"- {loc['format']['no_bullets']}")
+    parts.append(f"- {loc['format']['mention_errors']}")
     parts.append("")
-    parts.append("Generiere JETZT die Nachricht:")
+    parts.append(loc["format"]["generate"])
 
     return "\n".join(parts)
 
 
-def format_source_section(i: int, result: SourceResult) -> str:
-    """Format a single source result for the prompt."""
-    source_name = result.name.upper()
-    if not result.is_success():
-        return f"{i}. {source_name}: NICHT VERFÜGBAR — {result.error}\n"
+def _format_source_section(i: int, result: SourceResult, loc: dict) -> str:
+    """Format a single source result for the prompt using locale strings."""
+    raw_name = result.name.lower()
+    label = loc.get("source_labels", {}).get(raw_name, result.name.upper())
 
-    # Simplify the data for the prompt — exclude verbose fields
+    if not result.is_success():
+        return f"{i}. {label}: {loc['format']['error_prefix']} — {result.error}\n"
+
     data = result.data or {}
     simplified = _simplify_data(result.name, data)
-    import json
-    return f"{i}. {source_name}:\n{json.dumps(simplified, ensure_ascii=False, indent=2)}\n"
+    return f"{i}. {label}:\n{json.dumps(simplified, ensure_ascii=False, indent=2)}\n"
 
 
-def format_diff_section(diff: dict[str, Any]) -> str:
+def _format_diff_section(diff: dict[str, Any], loc: dict) -> str:
     """Format the yesterday comparison for the prompt."""
-    lines = ["VERGLEICH MIT GESTERN:"]
+    lines = [loc["format"]["yesterday"]]
     for source, changes in diff.items():
         if isinstance(changes, dict):
             note = changes.get("note", str(changes))
-            lines.append(f"  {source}: {note}")
+            lines.append(loc["diff"]["note_label"].format(source=source, note=note))
     return "\n".join(lines)
 
 
@@ -94,7 +104,7 @@ def _simplify_data(source_name: str, data: dict[str, Any]) -> dict[str, Any]:
     Keeps the essential fields the LLM needs — removes noise like URLs,
     raw IDs, and deeply nested structures.
     """
-    simplified = {}
+    simplified: dict[str, Any] = {}
 
     if source_name == "weather":
         # Single location
@@ -156,13 +166,3 @@ def _simplify_data(source_name: str, data: dict[str, Any]) -> dict[str, Any]:
         simplified = data  # Unknown source: pass through as-is
 
     return simplified
-
-
-_SYSTEM_INSTRUCTION = """Du bist der Daily Briefing Bot. Fasse die folgenden Daten in EINE
-Nachricht zusammen. Die Nachricht soll informativ, freundlich
-und auf den Punkt sein — so dass der Nutzer morgens in 5 Sekunden alles
-Wichtige erfasst hat.
-
-Priorität: Wetter > Termine > GitHub > Bahn > News > Reddit.
-Erwähne fehlerhafte Quellen nur kurz (z.B. "Bahn heute nicht verfügbar").
-"""

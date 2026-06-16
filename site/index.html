@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daily Briefing — your morning, summarized.</title>
-  <meta name="description" content="Your morning briefing in one WhatsApp message. Weather, calendar, GitHub, train departures, Reddit, news, and email — fetched in parallel every morning." />
+  <meta name="description" content="Weather, calendar, GitHub, news & Reddit — fetched in parallel, delivered to your phone." />
   <meta property="og:title" content="Daily Briefing" />
-  <meta property="og:description" content="Your morning briefing in one WhatsApp message." />
+  <meta property="og:description" content="Weather, calendar, GitHub, news & Reddit — fetched in parallel, delivered to your phone." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://daily-briefing-site.vercel.app/og.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,14 +29,14 @@
   <section class="hero">
     <div class="hero__bg"></div>
     <div class="hero__content">
-      <p class="hero__label">Open-source · Hermes Agent Skill</p>
+      <p class="hero__label">Open-source · Self-hosted · Extensible</p>
       <h1 class="hero__title">
         Your morning,<br />
         <span class="hero__title--accent">summarized.</span>
       </h1>
       <p class="hero__subtitle">
-        Weather, calendar, GitHub, trains, Reddit, and news<br />
-        — fetched in parallel, delivered in one WhatsApp message.
+        Weather, calendar, GitHub, news, Reddit & more<br />
+        — fetched in parallel, delivered to your phone.
       </p>
       <div class="hero__actions">
         <a href="https://github.com/kvnlnk/daily-briefing" class="btn btn--primary" target="_blank">
@@ -51,9 +51,13 @@
   <section id="demo" class="demo">
     <h2 class="section-title">Live Preview</h2>
     <p class="section-subtitle">What arrives on your phone every morning.</p>
+    <div class="demo__toggles">
+      <button class="demo__toggle demo__toggle--active" data-lang="en">🇬🇧 EN</button>
+      <button class="demo__toggle" data-lang="de">🇩🇪 DE</button>
+    </div>
     <div class="demo__phone">
       <div class="demo__statusbar">
-        <span>WhatsApp</span>
+        <span>daily-briefing</span>
         <span>now</span>
       </div>
       <div class="demo__chat">
@@ -126,10 +130,29 @@
       <div class="step__arrow">→</div>
       <div class="step">
         <span class="step__number">03</span>
-        <h3 class="step__title">WhatsApp Delivers</h3>
-        <p class="step__desc">Hermes cron sends the compact briefing message to your phone. Read it in 5 seconds, know everything.</p>
+        <h3 class="step__title">Pluggable Delivery</h3>
+        <p class="step__desc">
+          The summarized briefing is sent via stdout, ntfy push, email, or any
+          configured delivery method — no external scheduler required.
+        </p>
       </div>
     </div>
+  </section>
+
+  <section id="extend" class="extend">
+    <h2 class="section-title">Extend It</h2>
+    <p class="section-subtitle">Add any data source as a separate pip package. No fork needed.</p>
+    <div class="extend__code">
+<pre><code>class MySource(SourceProtocol):
+    name = "my_source"
+    def fetch(self, config):
+        return SourceResult(name=self.name, ...)</code></pre>
+    </div>
+    <p class="extend__caption">
+      Register via pyproject.toml entry point and it auto-appears in
+      <code>daily-briefing --list-sources</code>.
+      See the <a href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/source-authoring.md" target="_blank">source-authoring guide</a>.
+    </p>
   </section>
 
   <section class="cta-section">
@@ -142,7 +165,7 @@
   </section>
 
   <footer class="footer">
-    <p>Built with <a href="https://github.com/addyosmani/agent-skills" target="_blank">agent-skills</a> methodology · Powered by <a href="https://hermes-agent.nousresearch.com" target="_blank">Hermes Agent</a></p>
+    <p>Built with <a href="https://github.com/addyosmani/agent-skills" target="_blank">agent-skills</a> methodology · Works with <a href="https://hermes-agent.nousresearch.com" target="_blank">Hermes Agent</a>, among others</p>
     <p>© 2026 <a href="https://github.com/kvnlnk">kvnlnk</a> · MIT License</p>
   </footer>
 </body>
