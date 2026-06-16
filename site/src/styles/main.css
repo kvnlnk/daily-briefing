@@ -481,6 +481,39 @@ body {
   font-family: 'SFMono-Regular', 'Menlo', monospace;
 }
 
+/* ── Icon Box — hue-tinted emoji container ── */
+
+.icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  background: hsl(calc(var(--card-hue, 200)), 40%, 70%);
+  color: #fff;
+  margin-bottom: 0.75rem;
+}
+
+/* In dark contexts, lighter tint */
+.card .icon-box {
+  background: hsl(calc(var(--card-hue, 200)), 45%, 60%);
+}
+
+/* Pipeline icons use the existing dark variant — keep .pipeline__icon for animated icons,
+   but let .pipeline__icon also support --card-hue background */
+.pipeline__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-size: 1.15rem;
+  border-radius: 8px;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
 /* ── How It Works ── */
 
 .how {
@@ -652,9 +685,9 @@ body {
     justify-content: center;
     align-items: center;
     gap: 2rem;
-    background: rgba(11, 13, 26, 0.97);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(11, 13, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
@@ -818,7 +851,7 @@ body {
 .pipeline__flow {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 0.5rem;
   max-width: 1100px;
   margin: 0 auto 1.5rem;
@@ -838,6 +871,8 @@ body {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s ease, transform 0.5s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .pipeline__stage.visible {
@@ -880,7 +915,6 @@ body {
   font-size: 1.3rem;
   color: var(--amber);
   align-self: center;
-  padding-top: 3rem;
   opacity: 0;
   transition: opacity 0.4s ease;
   flex-shrink: 0;
@@ -1024,26 +1058,6 @@ body {
   font-style: italic;
 }
 
-.pipeline__replay {
-  display: inline-block;
-  margin-top: 0.75rem;
-  padding: 0.4rem 1.25rem;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.6);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-family: var(--font-body);
-  transition: all 0.2s ease;
-}
-
-.pipeline__replay:hover {
-  border-color: var(--amber-glow);
-  color: var(--amber-glow);
-  background: rgba(245, 166, 35, 0.08);
-}
-
 /* ── Pipeline responsive ── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1055,7 +1069,6 @@ body {
   .pipeline__prompt-badge { animation: none; opacity: 1; }
   .pipeline__assemble-arrow { animation: none; opacity: 1; }
   .pipeline__summarize-label { animation: none; opacity: 1; }
-  .pipeline__replay { display: none; }
 }
 
 @media (max-width: 900px) {
@@ -1098,15 +1111,68 @@ body {
   margin: 0 auto;
 }
 
+/* Carousel wrapper — horizontal snap scroll */
+.integrations__carousel {
+  position: relative;
+  width: 100%;
+}
+
 .integrations__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.5rem 0 1rem;
+  /* Peek affordance: next card peeks at the right */
+  padding-right: 20vw;
+  /* Gradient fade on right edge to hint more content */
+  mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
+}
+.integrations__grid::-webkit-scrollbar { display: none; }
+
+/* On wide viewports where all 5 fit, no scroll — centered flex */
+@media (min-width: 1024px) {
+  .integrations__grid {
+    overflow-x: visible;
+    justify-content: center;
+    padding-right: 0;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
 }
 
 .integrations__card {
+  flex: 0 0 280px;
+  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
+  min-width: 260px;
+}
+
+/* Dots indicator */
+.integrations__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.integrations__dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15);
+  transition: background 0.2s, transform 0.2s;
+  cursor: default;
+}
+.integrations__dots span.active {
+  background: var(--amber);
+  transform: scale(1.3);
+}
+.integrations__dots span:not(.active) {
+  background: var(--border);
 }
 
 .integrations__code {

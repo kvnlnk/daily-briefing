@@ -189,13 +189,15 @@ function setupPipelineTrigger() {
   observer.observe(pipelineSection);
 }
 
-/* ── Replay button ── */
+/* ── Replay on tap ── */
 
-function setupReplayButton() {
-  const replayBtn = document.getElementById('pipelineReplay');
-  if (!replayBtn) return;
+function setupPipelineTapReplay() {
+  const pipelineSection = document.getElementById('pipeline');
+  if (!pipelineSection) return;
 
-  replayBtn.addEventListener('click', () => {
+  pipelineSection.addEventListener('click', (e) => {
+    // Don't trigger if clicking a link inside the pipeline
+    if (e.target.closest('a')) return;
     pipelineAnimationActive = false;
     animatePipeline();
   });
@@ -218,6 +220,40 @@ function setupLanguageToggle() {
   });
 }
 
+/* ── Carousel dots for Run It Your Way ── */
+
+function setupCarouselDots() {
+  const grid = document.getElementById('integrationsGrid');
+  const dots = document.getElementById('integrationsDots');
+  if (!grid || !dots) return;
+
+  const cards = grid.querySelectorAll('.integrations__card');
+  if (cards.length === 0) return;
+
+  // Create dot for each card
+  cards.forEach(() => {
+    const dot = document.createElement('span');
+    dots.appendChild(dot);
+  });
+  const allDots = dots.querySelectorAll('span');
+  if (allDots.length > 0) allDots[0].classList.add('active');
+
+  // Update active dot on scroll
+  let ticking = false;
+  grid.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrollLeft = grid.scrollLeft;
+        const cardWidth = grid.scrollWidth / cards.length;
+        const activeIdx = Math.round(scrollLeft / cardWidth);
+        allDots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+}
+
 /* ── Init ── */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -228,7 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupRevealAnimations();
   setupLanguageToggle();
   setupPipelineTrigger();
-  setupReplayButton();
+  setupPipelineTapReplay();
+  setupCarouselDots();
 
   /* ── Burger menu toggle ── */
   const nav = document.getElementById('nav');

@@ -60,37 +60,37 @@
     <p class="section-subtitle">Seven sources. One morning message. Zero config changes.</p>
     <div class="features__grid">
       <article class="card" style="--card-hue: 190">
-        <div class="card__icon">🌤️</div>
+        <div class="card__icon icon-box">🌤️</div>
         <h3 class="card__title">Weather</h3>
         <p class="card__desc">Current conditions, today's high/low, rain chance, and feels-like — from Open-Meteo (free, no key).</p>
       </article>
       <article class="card" style="--card-hue: 220">
-        <div class="card__icon">📅</div>
+        <div class="card__icon icon-box">📅</div>
         <h3 class="card__title">Calendar</h3>
         <p class="card__desc">Today's events, busy-hours summary, and location info — via Google Calendar API.</p>
       </article>
       <article class="card" style="--card-hue: 10">
-        <div class="card__icon">🐙</div>
+        <div class="card__icon icon-box">🐙</div>
         <h3 class="card__title">GitHub</h3>
         <p class="card__desc">Assigned issues, review-requested PRs, and recently active repos — via the <code>gh</code> CLI.</p>
       </article>
       <article class="card" style="--card-hue: 35">
-        <div class="card__icon">🚆</div>
+        <div class="card__icon icon-box">🚆</div>
         <h3 class="card__title">Bahn</h3>
         <p class="card__desc">Next departures at your station with delay info — via the free DB transport.rest API.</p>
       </article>
       <article class="card" style="--card-hue: 280">
-        <div class="card__icon">🔴</div>
+        <div class="card__icon icon-box">🔴</div>
         <h3 class="card__title">Reddit</h3>
         <p class="card__desc">Top posts from your subreddits — via public RSS feeds, zero auth needed.</p>
       </article>
       <article class="card" style="--card-hue: 150">
-        <div class="card__icon">📰</div>
+        <div class="card__icon icon-box">📰</div>
         <h3 class="card__title">News</h3>
         <p class="card__desc">Headlines from your RSS feeds — deduplicated across sources via <code>feedparser</code>.</p>
       </article>
       <article class="card" style="--card-hue: 320">
-        <div class="card__icon">📬</div>
+        <div class="card__icon icon-box">📬</div>
         <h3 class="card__title">Email</h3>
         <p class="card__desc">Unread count and recent subjects — via stdlib <code>imaplib</code>, zero external deps.</p>
       </article>
@@ -130,12 +130,6 @@
         </div>
         <p class="pipeline__stage-desc">Sources converge into a structured prompt</p>
         <div class="pipeline__icons pipeline__icons--assemble" id="pipelineAssemble">
-          <span class="pipeline__icon">☀️</span>
-          <span class="pipeline__icon">📅</span>
-          <span class="pipeline__icon">🐙</span>
-          <span class="pipeline__icon">🚆</span>
-          <span class="pipeline__icon">📰</span>
-          <span class="pipeline__icon">💬</span>
           <span class="pipeline__assemble-arrow">→</span>
           <span class="pipeline__prompt-badge">📋 prompt</span>
         </div>
@@ -188,7 +182,6 @@
     </div>
 
     <p class="pipeline__footnote">⚡ illustration — no live data</p>
-    <button class="pipeline__replay" id="pipelineReplay">↻ Replay</button>
   </section>
 
   <!-- ═══════════════════════════════════════════
@@ -197,42 +190,45 @@
   <section id="integrations" class="integrations">
     <h2 class="section-title">Run It Your Way</h2>
     <p class="section-subtitle">Five operating modes — pick what fits your stack.</p>
-    <div class="integrations__grid">
-      <article class="card integrations__card" style="--card-hue: 35">
-        <div class="card__icon">⏰</div>
-        <h3 class="card__title">cron</h3>
-        <p class="card__desc">Schedule a daily briefing with a single crontab line. Works on any Unix system.</p>
-        <pre class="integrations__code"><code>0 7 * * * daily-briefing</code></pre>
-        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
-      </article>
-      <article class="card integrations__card" style="--card-hue: 220">
-        <div class="card__icon">⚙️</div>
-        <h3 class="card__title">systemd</h3>
-        <p class="card__desc">Run as a systemd timer for robust, logged execution. Survives reboots.</p>
-        <pre class="integrations__code"><code>OnCalendar=*-*-* 07:00:00</code></pre>
-        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
-      </article>
-      <article class="card integrations__card" style="--card-hue: 150">
-        <div class="card__icon">🐳</div>
-        <h3 class="card__title">Docker</h3>
-        <p class="card__desc">Containerized deployment — pull and run with zero host dependencies.</p>
-        <pre class="integrations__code"><code>docker run daily-briefing</code></pre>
-        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
-      </article>
-      <article class="card integrations__card" style="--card-hue: 280">
-        <div class="card__icon">🔄</div>
-        <h3 class="card__title">GitHub Actions</h3>
-        <p class="card__desc">Trigger via scheduled workflow. No server, no setup beyond a YAML file.</p>
-        <pre class="integrations__code"><code>schedule: cron: 0 7 * * *</code></pre>
-        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
-      </article>
-      <article class="card integrations__card" style="--card-hue: 10">
-        <div class="card__icon">🤖</div>
-        <h3 class="card__title">Hermes Agent</h3>
-        <p class="card__desc">Install as a Hermes skill — runs on your schedule alongside other agent tasks.</p>
-        <pre class="integrations__code"><code>hermes skill install daily-briefing</code></pre>
-        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
-      </article>
+    <div class="integrations__carousel" id="integrationsCarousel">
+      <div class="integrations__grid" id="integrationsGrid">
+        <article class="card integrations__card" style="--card-hue: 35">
+          <div class="card__icon icon-box">⏰</div>
+          <h3 class="card__title">cron</h3>
+          <p class="card__desc">Schedule a daily briefing with a single crontab line. Works on any Unix system.</p>
+          <pre class="integrations__code"><code>0 7 * * * daily-briefing</code></pre>
+          <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+        </article>
+        <article class="card integrations__card" style="--card-hue: 220">
+          <div class="card__icon icon-box">⚙️</div>
+          <h3 class="card__title">systemd</h3>
+          <p class="card__desc">Run as a systemd timer for robust, logged execution. Survives reboots.</p>
+          <pre class="integrations__code"><code>OnCalendar=*-*-* 07:00:00</code></pre>
+          <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+        </article>
+        <article class="card integrations__card" style="--card-hue: 150">
+          <div class="card__icon icon-box">🐳</div>
+          <h3 class="card__title">Docker</h3>
+          <p class="card__desc">Containerized deployment — pull and run with zero host dependencies.</p>
+          <pre class="integrations__code"><code>docker run daily-briefing</code></pre>
+          <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+        </article>
+        <article class="card integrations__card" style="--card-hue: 280">
+          <div class="card__icon icon-box">🔄</div>
+          <h3 class="card__title">GitHub Actions</h3>
+          <p class="card__desc">Trigger via scheduled workflow. No server, no setup beyond a YAML file.</p>
+          <pre class="integrations__code"><code>schedule: cron: 0 7 * * *</code></pre>
+          <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+        </article>
+        <article class="card integrations__card" style="--card-hue: 10">
+          <div class="card__icon icon-box">🤖</div>
+          <h3 class="card__title">Hermes Agent</h3>
+          <p class="card__desc">Install as a Hermes skill — runs on your schedule alongside other agent tasks.</p>
+          <pre class="integrations__code"><code>hermes skill install daily-briefing</code></pre>
+          <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+        </article>
+      </div>
+      <div class="integrations__dots" id="integrationsDots"></div>
     </div>
   </section>
 
