@@ -20,6 +20,8 @@
     <span class="nav__logo">🌅 daily-briefing</span>
     <div class="nav__links">
       <a href="#features">Features</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#integrations">Run It</a>
       <a href="#demo">Demo</a>
       <a href="#how" class="nav__link--mobile-hidden">How it Works</a>
       <a href="https://github.com/kvnlnk/daily-briefing" class="nav__cta" target="_blank">GitHub →</a>
@@ -43,30 +45,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
           View on GitHub
         </a>
-        <a href="#demo" class="btn btn--secondary">See Demo ↓</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="demo" class="demo">
-    <h2 class="section-title">Live Preview</h2>
-    <p class="section-subtitle">What arrives on your phone every morning.</p>
-    <div class="demo__toggles">
-      <button class="demo__toggle demo__toggle--active" data-lang="en">🇬🇧 EN</button>
-      <button class="demo__toggle" data-lang="de">🇩🇪 DE</button>
-    </div>
-    <div class="demo__phone">
-      <div class="demo__statusbar">
-        <span>daily-briefing</span>
-        <span>now</span>
-      </div>
-      <div class="demo__chat">
-        <div class="demo__avatar">🌅</div>
-        <div class="demo__bubble" id="demoBubble">
-          <div class="demo__bubble-content" id="demoContent">
-            <span class="demo__typing" id="demoTyping">⏳</span>
-          </div>
-        </div>
+        <a href="#pipeline" class="btn btn--secondary">See How It Works ↓</a>
       </div>
     </div>
   </section>
@@ -110,6 +89,168 @@
         <h3 class="card__title">Email</h3>
         <p class="card__desc">Unread count and recent subjects — via stdlib <code>imaplib</code>, zero external deps.</p>
       </article>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Pipeline Animation – Data Flow Demo
+       ═══════════════════════════════════════════ -->
+  <section id="pipeline" class="pipeline">
+    <h2 class="section-title">Pipeline</h2>
+    <p class="section-subtitle">Your data flows through 5 stages every morning.</p>
+
+    <div class="pipeline__flow">
+      <div class="pipeline__stage" data-stage="1">
+        <div class="pipeline__stage-header">
+          <span class="pipeline__stage-number">01</span>
+          <h3 class="pipeline__stage-title">Sources</h3>
+        </div>
+        <p class="pipeline__stage-desc">Parallel fetch from all sources</p>
+        <div class="pipeline__icons pipeline__icons--sources" id="pipelineSources">
+          <span class="pipeline__icon" data-icon="weather">☀️</span>
+          <span class="pipeline__icon" data-icon="calendar">📅</span>
+          <span class="pipeline__icon" data-icon="github">🐙</span>
+          <span class="pipeline__icon" data-icon="transit">🚆</span>
+          <span class="pipeline__icon" data-icon="news">📰</span>
+          <span class="pipeline__icon" data-icon="reddit">💬</span>
+        </div>
+      </div>
+
+      <div class="pipeline__arrow">→</div>
+
+      <div class="pipeline__stage" data-stage="2">
+        <div class="pipeline__stage-header">
+          <span class="pipeline__stage-number">02</span>
+          <h3 class="pipeline__stage-title">Assemble</h3>
+        </div>
+        <p class="pipeline__stage-desc">Sources converge into a structured prompt</p>
+        <div class="pipeline__icons pipeline__icons--assemble" id="pipelineAssemble">
+          <span class="pipeline__icon">☀️</span>
+          <span class="pipeline__icon">📅</span>
+          <span class="pipeline__icon">🐙</span>
+          <span class="pipeline__icon">🚆</span>
+          <span class="pipeline__icon">📰</span>
+          <span class="pipeline__icon">💬</span>
+          <span class="pipeline__assemble-arrow">→</span>
+          <span class="pipeline__prompt-badge">📋 prompt</span>
+        </div>
+      </div>
+
+      <div class="pipeline__arrow">→</div>
+
+      <div class="pipeline__stage" data-stage="3">
+        <div class="pipeline__stage-header">
+          <span class="pipeline__stage-number">03</span>
+          <h3 class="pipeline__stage-title">Summarize</h3>
+        </div>
+        <p class="pipeline__stage-desc">LLM processes the prompt</p>
+        <div class="pipeline__icons pipeline__icons--summarize" id="pipelineSummarize">
+          <div class="pipeline__spinner"></div>
+          <span class="pipeline__summarize-label">LLM summarizes…</span>
+        </div>
+      </div>
+
+      <div class="pipeline__arrow">→</div>
+
+      <div class="pipeline__stage" data-stage="4">
+        <div class="pipeline__stage-header">
+          <span class="pipeline__stage-number">04</span>
+          <h3 class="pipeline__stage-title">Deliver</h3>
+        </div>
+        <p class="pipeline__stage-desc">Briefing sent to your channels</p>
+        <div class="pipeline__icons pipeline__icons--deliver" id="pipelineDeliver">
+          <span class="pipeline__icon">💻</span>
+          <span class="pipeline__deliver-label">stdout</span>
+          <span class="pipeline__deliver-plus">+</span>
+          <span class="pipeline__icon">📱</span>
+          <span class="pipeline__deliver-label">ntfy</span>
+        </div>
+      </div>
+
+      <div class="pipeline__arrow">→</div>
+
+      <div class="pipeline__stage" data-stage="5">
+        <div class="pipeline__stage-header">
+          <span class="pipeline__stage-number">05</span>
+          <h3 class="pipeline__stage-title">Done</h3>
+        </div>
+        <p class="pipeline__stage-desc">Your morning briefing is ready</p>
+        <div class="pipeline__icons pipeline__icons--done" id="pipelineDone">
+          <span class="pipeline__done-check">✅</span>
+          <span class="pipeline__done-label">Delivered!</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="pipeline__footnote">⚡ illustration — no live data</p>
+    <button class="pipeline__replay" id="pipelineReplay">↻ Replay</button>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       Integrations – Run It Your Way
+       ═══════════════════════════════════════════ -->
+  <section id="integrations" class="integrations">
+    <h2 class="section-title">Run It Your Way</h2>
+    <p class="section-subtitle">Five operating modes — pick what fits your stack.</p>
+    <div class="integrations__grid">
+      <article class="card integrations__card" style="--card-hue: 35">
+        <div class="card__icon">⏰</div>
+        <h3 class="card__title">cron</h3>
+        <p class="card__desc">Schedule a daily briefing with a single crontab line. Works on any Unix system.</p>
+        <pre class="integrations__code"><code>0 7 * * * daily-briefing</code></pre>
+        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+      </article>
+      <article class="card integrations__card" style="--card-hue: 220">
+        <div class="card__icon">⚙️</div>
+        <h3 class="card__title">systemd</h3>
+        <p class="card__desc">Run as a systemd timer for robust, logged execution. Survives reboots.</p>
+        <pre class="integrations__code"><code>OnCalendar=*-*-* 07:00:00</code></pre>
+        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+      </article>
+      <article class="card integrations__card" style="--card-hue: 150">
+        <div class="card__icon">🐳</div>
+        <h3 class="card__title">Docker</h3>
+        <p class="card__desc">Containerized deployment — pull and run with zero host dependencies.</p>
+        <pre class="integrations__code"><code>docker run daily-briefing</code></pre>
+        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+      </article>
+      <article class="card integrations__card" style="--card-hue: 280">
+        <div class="card__icon">🔄</div>
+        <h3 class="card__title">GitHub Actions</h3>
+        <p class="card__desc">Trigger via scheduled workflow. No server, no setup beyond a YAML file.</p>
+        <pre class="integrations__code"><code>schedule: cron: 0 7 * * *</code></pre>
+        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+      </article>
+      <article class="card integrations__card" style="--card-hue: 10">
+        <div class="card__icon">🤖</div>
+        <h3 class="card__title">Hermes Agent</h3>
+        <p class="card__desc">Install as a Hermes skill — runs on your schedule alongside other agent tasks.</p>
+        <pre class="integrations__code"><code>hermes skill install daily-briefing</code></pre>
+        <a class="integrations__link" href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/usage.md" target="_blank">Learn more →</a>
+      </article>
+    </div>
+  </section>
+
+  <section id="demo" class="demo">
+    <h2 class="section-title">Live Preview</h2>
+    <p class="section-subtitle">What arrives on your phone every morning.</p>
+    <div class="demo__toggles">
+      <button class="demo__toggle demo__toggle--active" data-lang="en">🇬🇧 EN</button>
+      <button class="demo__toggle" data-lang="de">🇩🇪 DE</button>
+    </div>
+    <div class="demo__phone">
+      <div class="demo__statusbar">
+        <span>daily-briefing</span>
+        <span>now</span>
+      </div>
+      <div class="demo__chat">
+        <div class="demo__avatar">🌅</div>
+        <div class="demo__bubble">
+          <div class="demo__bubble-content" id="demoContent">
+            <span class="demo__typing" id="demoTyping">⏳</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

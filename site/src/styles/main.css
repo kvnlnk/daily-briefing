@@ -662,3 +662,355 @@ body {
   color: white;
   border-color: var(--accent);
 }
+
+/* ═══════════════════════════════════════════
+   Pipeline Animation – Data Flow Demo
+   ═══════════════════════════════════════════ */
+
+.pipeline {
+  padding: var(--space-xl) 2rem;
+  background: var(--bg-dark);
+  color: var(--cream);
+  text-align: center;
+  overflow: hidden;
+}
+
+.pipeline .section-title {
+  color: var(--cream);
+}
+
+.pipeline .section-subtitle {
+  color: rgba(255,255,255,0.6);
+}
+
+/* ── Pipeline flow container (flex row on desktop) ── */
+
+.pipeline__flow {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 1100px;
+  margin: 0 auto 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── Individual stage card ── */
+
+.pipeline__stage {
+  flex: 1;
+  min-width: 150px;
+  max-width: 190px;
+  padding: 1.5rem 1rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.pipeline__stage.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pipeline__stage-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.pipeline__stage-number {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--amber-glow);
+  opacity: 0.7;
+}
+
+.pipeline__stage-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.pipeline__stage-desc {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Arrow between stages ── */
+
+.pipeline__arrow {
+  font-size: 1.3rem;
+  color: var(--amber);
+  align-self: center;
+  padding-top: 3rem;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  flex-shrink: 0;
+}
+
+.pipeline__arrow.visible {
+  opacity: 1;
+}
+
+/* ── Shared icon row ── */
+
+.pipeline__icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  min-height: 40px;
+}
+
+.pipeline__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1.15rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+/* ── Stage 1: Sources – staggered entrance ── */
+
+.pipeline__icons--sources .pipeline__icon {
+  opacity: 0;
+  transform: scale(0.5);
+  animation: source-pop 0.4s ease forwards;
+}
+
+.pipeline__icons--sources .pipeline__icon[data-icon="weather"]   { animation-delay: 0.1s; }
+.pipeline__icons--sources .pipeline__icon[data-icon="calendar"]  { animation-delay: 0.25s; }
+.pipeline__icons--sources .pipeline__icon[data-icon="github"]    { animation-delay: 0.4s; }
+.pipeline__icons--sources .pipeline__icon[data-icon="transit"]   { animation-delay: 0.55s; }
+.pipeline__icons--sources .pipeline__icon[data-icon="news"]      { animation-delay: 0.7s; }
+.pipeline__icons--sources .pipeline__icon[data-icon="reddit"]    { animation-delay: 0.85s; }
+
+@keyframes source-pop {
+  0%   { opacity: 0; transform: scale(0.5); }
+  60%  { transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Stage 2: Assemble – converge arrow ── */
+
+.pipeline__assemble-arrow {
+  font-size: 1rem;
+  color: var(--amber-glow);
+  opacity: 0;
+  animation: fade-in 0.3s ease 0.4s forwards;
+}
+
+.pipeline__prompt-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(245, 166, 35, 0.15);
+  color: var(--amber-glow);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  border-radius: 6px;
+  opacity: 0;
+  animation: fade-in 0.3s ease 0.6s forwards;
+}
+
+/* ── Stage 3: Summarize – spinner ── */
+
+.pipeline__spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: var(--amber-glow);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+
+.pipeline__summarize-label {
+  font-size: 0.8rem;
+  color: var(--amber-glow);
+  font-weight: 500;
+  opacity: 0;
+  animation: fade-in 0.4s ease 0.3s forwards;
+}
+
+/* ── Stage 4: Deliver ── */
+
+.pipeline__deliver-label {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+}
+
+.pipeline__deliver-plus {
+  color: rgba(255,255,255,0.3);
+  font-size: 0.85rem;
+}
+
+/* ── Stage 5: Done ── */
+
+.pipeline__done-check {
+  font-size: 1.5rem;
+  animation: done-bounce 0.5s ease forwards;
+}
+
+@keyframes done-bounce {
+  0%   { transform: scale(0); }
+  50%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.pipeline__done-label {
+  font-size: 0.85rem;
+  color: #4ade80;
+  font-weight: 600;
+}
+
+/* ── Footnote & Replay ── */
+
+.pipeline__footnote {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+}
+
+.pipeline__replay {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.4rem 1.25rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: var(--font-body);
+  transition: all 0.2s ease;
+}
+
+.pipeline__replay:hover {
+  border-color: var(--amber-glow);
+  color: var(--amber-glow);
+  background: rgba(245, 166, 35, 0.08);
+}
+
+/* ── Pipeline responsive ── */
+
+@media (max-width: 900px) {
+  .pipeline__stage {
+    min-width: 130px;
+    max-width: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pipeline__flow {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .pipeline__stage {
+    min-width: 0;
+    max-width: 340px;
+    width: 100%;
+  }
+
+  .pipeline__arrow {
+    transform: rotate(90deg);
+    padding: 0.25rem 0;
+  }
+
+  .pipeline__arrow.visible {
+    transform: rotate(90deg);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Integrations – Run It Your Way
+   ═══════════════════════════════════════════ */
+
+.integrations {
+  padding: var(--space-xl) 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.integrations__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.integrations__card {
+  display: flex;
+  flex-direction: column;
+}
+
+.integrations__code {
+  margin: 0.75rem 0 0.5rem;
+  padding: 0;
+  background: transparent;
+}
+
+.integrations__code code {
+  display: block;
+  padding: 0.6rem 0.85rem;
+  background: #111;
+  color: #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.integrations__link {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--amber);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.integrations__link:hover {
+  color: var(--amber-glow);
+  text-decoration: underline;
+}
+
+/* ── Integrations responsive ── */
+
+@media (max-width: 900px) {
+  .integrations__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  .integrations__grid {
+    grid-template-columns: 1fr;
+  }
+}

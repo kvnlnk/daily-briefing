@@ -9,11 +9,13 @@ from __future__ import annotations
 from daily_briefing.delivery.base import DeliveryProtocol, DeliveryResult
 from daily_briefing.delivery.senders.stdout import StdoutSender
 from daily_briefing.delivery.senders.ntfy import NtfySender
+from daily_briefing.delivery.senders.telegram import TelegramSender
 
 # Registry of available senders
 _SENDERS: dict[str, type[DeliveryProtocol]] = {
     "stdout": StdoutSender,
     "ntfy": NtfySender,
+    "telegram": TelegramSender,
 }
 
 
