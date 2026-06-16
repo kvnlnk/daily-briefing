@@ -82,7 +82,7 @@ def fetch_all(config: BriefingConfig | None = None) -> list[SourceResult]:
         future_map: dict[concurrent.futures.Future, str] = {}
 
         for src_cfg in enabled:
-            if src_cfg.name not in SOURCE_REGISTRY:
+            if src_cfg.name not in _ENTRY_POINTS and src_cfg.name not in SOURCE_REGISTRY:
                 results.append(SourceResult(
                     name=src_cfg.name,
                     priority=src_cfg.priority,
