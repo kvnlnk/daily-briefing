@@ -20,11 +20,9 @@ import requests
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
-# Configure via env vars (supports .env file)
-DEPARTURE_STATION = os.environ.get("BAHN_DEPARTURE_STATION", "8000105")  # Frankfurt Hbf
-ARRIVAL_STATION = os.environ.get("BAHN_ARRIVAL_STATION", "")
-DEPARTURE_TIME = os.environ.get("BAHN_TIME", "07:30")
-BAHN_MODE = os.environ.get("BAHN_MODE", "depart")  # 'depart' or 'arrive'
+# Station defaults removed — configuration is exclusively from brief.yaml
+# or env vars (BAHN_DEPARTURE_STATION etc.).
+# Find station IDs at: https://v6.db.transport.rest/stops
 
 
 class BahnSource(SourceProtocol):
@@ -35,10 +33,19 @@ class BahnSource(SourceProtocol):
     def fetch(self, config: dict[str, Any]) -> SourceResult:
         """Fetch next departures from DB Fahrplan."""
         source_config = config.get("sources", {}).get("bahn", {})
-        station_id = source_config.get("station", DEPARTURE_STATION)
-        target_station = source_config.get("target_station", ARRIVAL_STATION)
-        time_filter = source_config.get("time", DEPARTURE_TIME)
-        mode = source_config.get("mode", BAHN_MODE)
+        station_id = source_config.get("station", None)
+        if not station_id:
+            station_id = os.environ.get("BAHN_DEPARTURE_STATION", None)
+        if not station_id:
+            return SourceResult(
+                name=self.name,
+                priority=40,
+                error="Bahn not configured. Add sources.bahn.station to brief.yaml or set BAHN_DEPARTURE_STATION env var",
+            )
+
+        target_station = source_config.get("target_station", None) or os.environ.get("BAHN_ARRIVAL_STATION", "")
+        time_filter = source_config.get("time", None) or os.environ.get("BAHN_TIME", "")
+        mode = source_config.get("mode", None) or os.environ.get("BAHN_MODE", "depart")
 
         try:
             # First, get station name for display
