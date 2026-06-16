@@ -53,8 +53,21 @@ class BriefingConfig:
     raw: dict = field(default_factory=dict)
 
     def enabled_sources(self) -> list[SourceConfig]:
-        """Return enabled sources sorted by priority (lowest first)."""
+        """Return enabled sources sorted by priority (lowest first).
+
+        If a variant is configured in output.variant and the variants.*.sources
+        list exists, only sources listed for that variant are returned.
+        """
         enabled = [s for s in self.sources.values() if s.enabled]
+
+        # Apply variant filtering
+        variant_name = self.raw.get("output", {}).get("variant", "morning")
+        variants = self.raw.get("variants", {})
+        variant_sources = variants.get(variant_name, {}).get("sources") if variants else None
+
+        if variant_sources is not None:
+            enabled = [s for s in enabled if s.name in variant_sources]
+
         return sorted(enabled, key=lambda s: s.priority)
 
 

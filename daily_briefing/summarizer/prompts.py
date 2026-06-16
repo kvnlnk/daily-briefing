@@ -43,7 +43,12 @@ def build_prompt(
     resolved_lang = lang or getattr(config, "lang", "en") or "en"
     loc = load_locale(resolved_lang)
 
-    parts = [loc["system_instruction"]]
+    # Use variant-specific template if available, else locale default
+    variant_prompts = loc.get("prompts", {}).get(variant, {})
+    system_instruction = variant_prompts.get("system_instruction", loc.get("system_instruction", ""))
+    structure_line = variant_prompts.get("structure", loc["format"].get("structure", ""))
+
+    parts = [system_instruction]
 
     # Add yesterday context if available
     if yesterday_diff:
@@ -66,7 +71,7 @@ def build_prompt(
         parts.append(f"- {loc['format']['emoji_on']}")
     else:
         parts.append(f"- {loc['format']['emoji_off']}")
-    parts.append(f"- {loc['format']['structure']}")
+    parts.append(f"- {structure_line}")
     parts.append(f"- {loc['format']['no_bullets']}")
     parts.append(f"- {loc['format']['mention_errors']}")
     parts.append("")
