@@ -28,17 +28,31 @@ Schönen Tag! ☕`;
 
 /* ── Typing effect ── */
 
+let typingTimer = null;
+let typingTimeouts = [];
+
+function cancelTyping() {
+  if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+  typingTimeouts.forEach(t => clearTimeout(t));
+  typingTimeouts = [];
+}
+
 function typeMessage(element, text, speed = 12) {
+  // Cancel any running animation first
+  cancelTyping();
+
   const typingIndicator = document.getElementById('demoTyping');
   let index = 0;
   let result = '';
 
   // Reset display
+  element.textContent = '';
   if (typingIndicator) typingIndicator.style.display = 'inline-block';
 
   // Hide typing indicator after a moment
-  setTimeout(() => {
+  typingTimer = setTimeout(() => {
     if (typingIndicator) typingIndicator.style.display = 'none';
+    typingTimer = null;
   }, 600);
 
   function type() {
@@ -46,13 +60,14 @@ function typeMessage(element, text, speed = 12) {
       result += text[index];
       element.textContent = result;
       index++;
-      // Speed varies for natural feel
       const delay = text[index] === '\n' ? speed * 3 : speed;
-      setTimeout(type, delay + (Math.random() * 8 - 4));
+      const t = setTimeout(type, delay + (Math.random() * 8 - 4));
+      typingTimeouts.push(t);
     }
   }
 
-  setTimeout(type, 800);
+  const start = setTimeout(type, 800);
+  typingTimeouts.push(start);
 }
 
 /* ── Pipeline animation orchestration ── */
