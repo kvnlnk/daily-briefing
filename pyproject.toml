@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "daily-briefing"
 version = "0.1.0"
-description = "AI-powered morning briefing — weather, calendar, GitHub, commute, and news in one WhatsApp message"
+description = "AI-powered morning briefing — weather, calendar, GitHub, commute, and news in one message"
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.0",

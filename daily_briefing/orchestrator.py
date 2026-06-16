@@ -3,14 +3,13 @@
 Loads config, discovers enabled sources, fetches them concurrently via
 ThreadPoolExecutor, and returns results sorted by priority.
 
-Each source is wrapped in a timeout + error handler so one slow or
-broken source cannot block the entire briefing.
+All source discovery goes through entry points (`daily_briefing.sources`
+group in pyproject.toml). No hardcoded registry.
 """
 
 from __future__ import annotations
 
 import concurrent.futures
-import importlib
 import importlib.metadata
 import logging
 from typing import Any
@@ -18,19 +17,7 @@ from typing import Any
 from daily_briefing.config import BriefingConfig, load_config
 from daily_briefing.sources.base import SourceResult
 
-# Source module → class name mapping (deprecated — use entry points).
-# Kept as fallback for one release. New sources should use entry points.
-SOURCE_REGISTRY: dict[str, tuple[str, str]] = {
-    "weather": ("daily_briefing.sources.weather", "WeatherSource"),
-    "github": ("daily_briefing.sources.github", "GitHubSource"),
-    "calendar": ("daily_briefing.sources.calendar", "CalendarSource"),
-    "bahn": ("daily_briefing.sources.bahn", "BahnSource"),
-    "reddit": ("daily_briefing.sources.reddit", "RedditSource"),
-    "news": ("daily_briefing.sources.news", "NewsSource"),
-    "email": ("daily_briefing.sources.email", "EmailSource"),
-}
-
-# Discovered entry points — populated after function definition below
+# Discovered entry points — populated at module load time
 _ENTRY_POINTS: dict[str, importlib.metadata.EntryPoint] = {}
 
 
@@ -39,7 +26,8 @@ def discover_sources() -> dict[str, importlib.metadata.EntryPoint]:
 
     Returns:
         Dict mapping source name → EntryPoint. Third-party source packages
-        auto-appear here when installed.
+        auto-appear here when installed. Built-in sources are registered
+        in pyproject.toml [project.entry-points."daily_briefing.sources"].
     """
     eps_by_name: dict[str, importlib.metadata.EntryPoint] = {}
     for ep in importlib.metadata.entry_points(group="daily_briefing.sources"):
@@ -82,11 +70,12 @@ def fetch_all(config: BriefingConfig | None = None) -> list[SourceResult]:
         future_map: dict[concurrent.futures.Future, str] = {}
 
         for src_cfg in enabled:
-            if src_cfg.name not in _ENTRY_POINTS and src_cfg.name not in SOURCE_REGISTRY:
+            if src_cfg.name not in _ENTRY_POINTS:
                 results.append(SourceResult(
                     name=src_cfg.name,
                     priority=src_cfg.priority,
-                    error=f"Unknown source '{src_cfg.name}' — not in SOURCE_REGISTRY",
+                    error=f"Unknown source '{src_cfg.name}' — not installed. "
+                          f"Available: {sorted(_ENTRY_POINTS.keys())}",
                 ))
                 continue
 
@@ -139,45 +128,24 @@ def fetch_single(source_name: str, config: BriefingConfig | None = None) -> Sour
 def _fetch_one(source_name: str, raw_config: dict[str, Any]) -> SourceResult:
     """Instantiate and call a single source module by name.
 
-    Tries entry-point discovery first (new mechanism).
-    Falls back to hardcoded SOURCE_REGISTRY (deprecated).
+    Sources are resolved exclusively via entry-point discovery.
+    Built-in sources and third-party plugins use the same mechanism.
     """
-    # Try entry points first (new discovery mechanism)
-    if source_name in _ENTRY_POINTS:
-        try:
-            cls = _ENTRY_POINTS[source_name].load()
-            source = cls()
-            return source.fetch(raw_config)
-        except Exception as e:
-            return SourceResult(
-                name=source_name,
-                priority=99,
-                error=f"Error loading '{source_name}' entry point: {e}",
-            )
-
-    # Fall back to hardcoded registry (deprecated)
-    if source_name not in SOURCE_REGISTRY:
+    ep = _ENTRY_POINTS.get(source_name)
+    if ep is None:
         return SourceResult(
             name=source_name,
             priority=99,
-            error=f"Unknown source '{source_name}'",
+            error=f"Unknown source '{source_name}'. Available: {sorted(_ENTRY_POINTS.keys())}",
         )
 
-    module_path, class_name = SOURCE_REGISTRY[source_name]
     try:
-        module = importlib.import_module(module_path)
-        source_class = getattr(module, class_name)
-        source = source_class()
+        cls = ep.load()
+        source = cls()
         return source.fetch(raw_config)
-    except ImportError as e:
-        return SourceResult(
-            name=source_name,
-            priority=99,
-            error=f"Cannot import {module_path}: {e}",
-        )
     except Exception as e:
         return SourceResult(
             name=source_name,
             priority=99,
-            error=f"Error instantiating {class_name}: {e}",
+            error=f"Error loading '{source_name}': {e}",
         )

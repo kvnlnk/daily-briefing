@@ -14,7 +14,7 @@ import click
 import yaml
 
 from daily_briefing.config import load_config
-from daily_briefing.orchestrator import SOURCE_REGISTRY
+from daily_briefing.orchestrator import discover_sources
 from daily_briefing.summarizer import PROVIDERS as SUMMARIZER_PROVIDERS
 
 
@@ -68,21 +68,22 @@ def run_doctor(config_path: str | None = None) -> bool:
     # Step 3: Check sources
     click.echo("")
     click.echo("📡 Sources:")
+    eps = discover_sources()
+    total_count = len(eps)
     enabled_count = 0
-    total_count = len(SOURCE_REGISTRY)
 
     if config:
         enabled = config.enabled_sources()
         enabled_count = len(enabled)
         enabled_names = {s.name for s in enabled}
 
-        for name in sorted(SOURCE_REGISTRY):
+        for name in sorted(eps):
             if name in enabled_names:
                 click.echo(f"  {name:12} ✅ enabled")
             else:
                 click.echo(f"  {name:12} ⚠️  disabled")
     else:
-        for name in sorted(SOURCE_REGISTRY):
+        for name in sorted(eps):
             click.echo(f"  {name:12} ⚠️  (no config loaded)")
 
     click.echo(f"  {'─' * 30}")
