@@ -11,15 +11,15 @@ from __future__ import annotations
 
 import concurrent.futures
 import importlib
+import importlib.metadata
 import logging
 from typing import Any
 
 from daily_briefing.config import BriefingConfig, load_config
 from daily_briefing.sources.base import SourceResult
 
-# Source module → class name mapping.
-# Add new sources here when creating additional modules.
-# Key = source name (matches brief.yaml key), Value = (module, class)
+# Source module → class name mapping (deprecated — use entry points).
+# Kept as fallback for one release. New sources should use entry points.
 SOURCE_REGISTRY: dict[str, tuple[str, str]] = {
     "weather": ("daily_briefing.sources.weather", "WeatherSource"),
     "github": ("daily_briefing.sources.github", "GitHubSource"),
@@ -30,8 +30,28 @@ SOURCE_REGISTRY: dict[str, tuple[str, str]] = {
     "email": ("daily_briefing.sources.email", "EmailSource"),
 }
 
+# Discovered entry points — populated after function definition below
+_ENTRY_POINTS: dict[str, importlib.metadata.EntryPoint] = {}
+
+
+def discover_sources() -> dict[str, importlib.metadata.EntryPoint]:
+    """Discover all installed daily_briefing.sources entry points.
+
+    Returns:
+        Dict mapping source name → EntryPoint. Third-party source packages
+        auto-appear here when installed.
+    """
+    eps_by_name: dict[str, importlib.metadata.EntryPoint] = {}
+    for ep in importlib.metadata.entry_points(group="daily_briefing.sources"):
+        eps_by_name[ep.name] = ep
+    return eps_by_name
+
+
+# Initialize entry points at module load time
+_ENTRY_POINTS.update(discover_sources())
+
+
 # Per-source timeout in seconds.
-# Some sources (DB API, IMAP) may be slow; keep it generous.
 SOURCE_TIMEOUT = 20
 
 logger = logging.getLogger(__name__)
@@ -117,7 +137,25 @@ def fetch_single(source_name: str, config: BriefingConfig | None = None) -> Sour
 
 
 def _fetch_one(source_name: str, raw_config: dict[str, Any]) -> SourceResult:
-    """Instantiate and call a single source module by name."""
+    """Instantiate and call a single source module by name.
+
+    Tries entry-point discovery first (new mechanism).
+    Falls back to hardcoded SOURCE_REGISTRY (deprecated).
+    """
+    # Try entry points first (new discovery mechanism)
+    if source_name in _ENTRY_POINTS:
+        try:
+            cls = _ENTRY_POINTS[source_name].load()
+            source = cls()
+            return source.fetch(raw_config)
+        except Exception as e:
+            return SourceResult(
+                name=source_name,
+                priority=99,
+                error=f"Error loading '{source_name}' entry point: {e}",
+            )
+
+    # Fall back to hardcoded registry (deprecated)
     if source_name not in SOURCE_REGISTRY:
         return SourceResult(
             name=source_name,
