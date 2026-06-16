@@ -20,7 +20,7 @@ import requests
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
-DEFAULT_SUBREDDITS = os.environ.get("REDDIT_SUBREDDITS", "programming,de")
+# DEFAULT_SUBREDDITS removed — subreddits are exclusively from brief.yaml or ENV
 MAX_POSTS_PER_SUB = 3
 
 
@@ -32,7 +32,13 @@ class RedditSource(SourceProtocol):
     def fetch(self, config: dict[str, Any]) -> SourceResult:
         """Fetch top posts from all configured subreddits."""
         source_config = config.get("sources", {}).get("reddit", {})
-        subreddits_raw = source_config.get("subreddits", DEFAULT_SUBREDDITS)
+        subreddits_raw = source_config.get("subreddits", None)
+        if not subreddits_raw:
+            return SourceResult(
+                name=self.name,
+                priority=50,
+                error="No subreddits configured. Add sources.reddit.subreddits to brief.yaml",
+            )
         if isinstance(subreddits_raw, str):
             subreddits = [s.strip() for s in subreddits_raw.split(",") if s.strip()]
         else:
