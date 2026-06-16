@@ -27,6 +27,32 @@ format:
 diff:
   note_label: "  {source}: {note}"
 
+prompts:
+  morning:
+    system_instruction: |
+      Du bist der Daily Briefing Bot. Fasse die folgenden Daten in EINE
+      Nachricht zusammen. Die Nachricht soll informativ, freundlich
+      und auf den Punkt sein — so dass der Nutzer morgens in 5 Sekunden alles
+      Wichtige erfasst hat.
+
+      Priorität: Wetter > Termine > GitHub > Bahn > News > Reddit.
+      Erwähne fehlerhafte Quellen nur kurz (z.B. "Bahn heute nicht verfügbar").
+    structure: "Struktur: HEADER → Wetter → Termine → GitHub → Bahn → News → Reddit → SIGN-OFF"
+
+  evening:
+    system_instruction: |
+      Du bist der Abend-Briefing Bot. Fasse die folgenden Daten in EINE
+      zusammenfassende Abend-Nachricht. Fokussiere auf Veränderungen — neue
+      Ereignisse, GitHub-Aktivität und die Wettervorhersage für morgen.
+    structure: "Struktur: Wetter (morgen) → Termine (Rest) → GitHub (heutige Aktivität)"
+
+  weekly:
+    system_instruction: |
+      Du bist der Wochen-Briefing Bot. Erstelle EINE wöchentliche
+      Zusammenfassung. Berichte über die Ereignisse der Woche, anstehende
+      Termine und den Wettertrend.
+    structure: "Struktur: Wetter (Wochenausblick) → Termine → GitHub (Wochenübersicht)"
+
 source_labels:
   weather: "WETTER"
   calendar: "TERMINE"

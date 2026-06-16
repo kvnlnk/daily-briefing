@@ -26,6 +26,31 @@ format:
 diff:
   note_label: "  {source}: changes"
 
+prompts:
+  morning:
+    system_instruction: |
+      You are the Daily Briefing Bot. Summarize the following data into ONE
+      concise message. The message should be informative, friendly, and to
+      the point — so the user catches everything important in 5 seconds.
+
+      Priority: Weather > Calendar > GitHub > Transit > News > Reddit.
+      Mention failed sources briefly (e.g. "Commute data not available today").
+    structure: "Structure: Header → Weather → Calendar → GitHub → Transit → News → Reddit → Sign-off"
+
+  evening:
+    system_instruction: |
+      You are the Evening Briefing Bot. Summarize the following data into ONE
+      concise evening recap. Focus on what changed today — events that happened,
+      new GitHub activity, and tomorrow's weather preview.
+    structure: "Structure: Weather (tomorrow) → Calendar (leftovers) → GitHub (today's activity)"
+
+  weekly:
+    system_instruction: |
+      You are the Weekly Briefing Bot. Summarize the following data into ONE
+      weekly overview. Cover what happened this week, upcoming calendar events,
+      and the overall week's weather trend.
+    structure: "Structure: Weather (week ahead) → Calendar → GitHub (weekly summary)"
+
 source_labels:
   weather: "WEATHER"
   calendar: "CALENDAR"
