@@ -10,6 +10,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import logging
 import sys
 from typing import Any
 
@@ -27,8 +28,11 @@ from daily_briefing.summarizer.prompts import build_prompt
 @click.option("--config", "-c", "config_path", default=None, help="Path to brief.yaml")
 @click.option("--json", "json_output", is_flag=True, help="Output raw JSON instead of formatted text")
 @click.option("--verbose", "-v", is_flag=True, help="Print debug information")
-def main(source: str | None, config_path: str | None, json_output: bool, verbose: bool) -> None:
+@click.option("--log-level", default="WARNING", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]), help="Set logging level")
+def main(source: str | None, config_path: str | None, json_output: bool, verbose: bool, log_level: str) -> None:
     """Fetch and display your daily briefing."""
+
+    logging.basicConfig(level=getattr(logging, log_level.upper()), format="%(levelname)s:%(name)s:%(message)s")
 
     configuration = load_config(config_path)
 
