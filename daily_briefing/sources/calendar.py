@@ -1,29 +1,30 @@
 """Calendar source — fetches today's events from Google Calendar.
 
-Uses `google-api-python-client` (already installed) which works with the
-Hermes `google-workspace` skill OAuth setup.
+Uses `google-api-python-client` (optional dependency).
 
-Expected OAuth flow (one-time):
-  python ~/.hermes/skills/productivity.disabled/google-workspace/scripts/setup.py --check
-    → If NOT_AUTHENTICATED, follow the skill's setup instructions.
-  The Google token lives at ~/.hermes/google_token.json after setup.
+OAuth setup (one-time):
+  1. Go to https://console.cloud.google.com/apis/credentials
+  2. Create OAuth 2.0 Client ID for Desktop app
+  3. Download credentials and save as ~/.google_client_id.json
+  4. Run: pip install 'daily-briefing[calendar]'
+  5. First run will open a browser for OAuth consent
+  6. Token is saved to ~/.google_token.json (configurable)
 
 Calendar list output per event:
-  {id, summary, start, end, location, description, htmlLink}
+  {title, start, end, location, link}
 """
 
 from __future__ import annotations
 
 import datetime
 import os
-import sys
 from typing import Any
 from zoneinfo import ZoneInfo
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
-# Timezone for date boundary calculation (user's local timezone)
-TZ_BERLIN = ZoneInfo("Europe/Berlin")
+# Default token path — can be overridden via brief.yaml or GOOGLE_TOKEN_PATH env var
+DEFAULT_TOKEN_PATH = os.path.expanduser("~/.google_token.json")
 
 
 def today_start_in_tz(now: datetime.datetime, tz: ZoneInfo) -> datetime.datetime:
@@ -40,7 +41,13 @@ class CalendarSource(SourceProtocol):
     def fetch(self, config: dict[str, Any]) -> SourceResult:
         """Fetch events for today."""
         try:
-            events = self._get_events()
+            source_config = config.get("sources", {}).get("calendar", {})
+            token_path = (
+                source_config.get("token_path", None)
+                or os.environ.get("GOOGLE_TOKEN_PATH", None)
+                or DEFAULT_TOKEN_PATH
+            )
+            events = self._get_events(token_path)
             return SourceResult(
                 name=self.name,
                 priority=20,
@@ -58,12 +65,10 @@ class CalendarSource(SourceProtocol):
             )
         except Exception as e:
             error_msg = str(e)
-            # Give helpful guidance for common setup issues
-            if "NOT_AUTHENTICATED" in error_msg or "credentials" in error_msg.lower():
+            if "credentials" in error_msg.lower() or "token" in error_msg.lower():
                 error_msg = (
                     "Google Calendar not authenticated. "
-                    "Run the google-workspace skill setup: "
-                    "python ~/.hermes/skills/productivity.disabled/google-workspace/scripts/setup.py --check"
+                    "See docs/calendar-setup.md for OAuth setup instructions."
                 )
             return SourceResult(
                 name=self.name,
@@ -71,18 +76,23 @@ class CalendarSource(SourceProtocol):
                 error=f"Calendar error: {error_msg}",
             )
 
-    def _get_events(self) -> list[dict[str, Any]]:
+    def _get_events(self, token_path: str) -> list[dict[str, Any]]:
         """Fetch today's events from Google Calendar."""
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
         from googleapiclient.discovery import build
 
-        creds = self._load_credentials()
+        creds = self._load_credentials(token_path)
+        if creds is None:
+            raise FileNotFoundError(f"Google token not found at {token_path}")
+
         service = build("calendar", "v3", credentials=creds)
 
         # Time range: midnight to midnight in user's timezone
+        tz_name = os.environ.get("TZ", "Europe/Berlin")
+        tz = ZoneInfo(tz_name)
         now = datetime.datetime.now(datetime.timezone.utc)
-        today_start = today_start_in_tz(now, TZ_BERLIN)
+        today_start = today_start_in_tz(now, tz)
         today_end = today_start + datetime.timedelta(days=1)
 
         events_result = (
@@ -112,28 +122,26 @@ class CalendarSource(SourceProtocol):
 
         return events
 
-    def _load_credentials(self):
-        """Load Google OAuth credentials from Hermes token file."""
+    def _load_credentials(self, token_path: str):
+        """Load Google OAuth credentials from token file.
+
+        Returns None if token file doesn't exist (graceful degradation).
+        """
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
 
-        token_path = os.path.expanduser("~/.hermes/google_token.json")
+        token_path = os.path.expanduser(token_path)
 
         if not os.path.exists(token_path):
-            # Try alternate locations
-            alt_path = os.path.expanduser("~/.hermes/google_oauth_token.json")
-            if os.path.exists(alt_path):
-                token_path = alt_path
-            else:
-                raise FileNotFoundError(
-                    f"Google token not found at {token_path}. "
-                    "Run the google-workspace skill setup first."
-                )
+            return None
 
         creds = Credentials.from_authorized_user_file(token_path)
 
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except Exception:
+                return None
 
         return creds
 
