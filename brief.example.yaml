@@ -1,0 +1,78 @@
+# 🌅 Daily Briefing — Configuration
+# Copy this file as brief.yaml and customize for your setup.
+# brief.yaml is gitignored — your config stays private.
+#
+# Each source has an 'enabled' flag and source-specific options.
+# Sources run in parallel; priority controls display order (lower = first).
+
+sources:
+  weather:
+    enabled: true
+    priority: 10        # Shown first
+    locations:
+      - name: London
+        lat: 51.5074
+        lon: -0.1278
+
+  calendar:
+    enabled: false       # Requires Google Calendar OAuth
+    priority: 20
+    # token_path: ~/.google_token.json  # optional, defaults to ~/.google_token.json
+
+  github:
+    enabled: false       # Requires gh CLI authentication
+    priority: 30
+
+  bahn:
+    enabled: false       # Requires station config (German rail only)
+    priority: 40
+    # station: 8000105   # Frankfurt Hbf — find yours at https://v6.db.transport.rest/stops
+    # target_station:    # optional filter
+    # time:              # optional time filter (e.g. "07:30")
+
+  reddit:
+    enabled: true
+    priority: 50
+    subreddits: programming  # comma-separated, e.g. "programming,de"
+
+  news:
+    enabled: true
+    priority: 60
+    feeds: https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml  # comma-separated URLs
+
+  email:
+    enabled: false       # Requires IMAP credentials in .env
+    priority: 70
+
+# Summarizer — selects which LLM summarizes your briefing
+# Providers: prompt-only (default, zero-config), ollama, openai, anthropic
+summarizer:
+  provider: prompt-only
+  # model: llama3.2          # for ollama
+  # base_url: http://localhost:11434  # for ollama
+
+# Delivery — where the briefing is sent
+# At least one method is required. stdout is always the fallback.
+delivery:
+  - method: stdout
+  # - method: ntfy
+  #   topic: my-briefing     # see ntfy.sh — set NTFY_TOPIC in .env
+
+# Briefing output settings
+output:
+  variant: morning        # morning | evening | weekly
+  max_length: 800         # Max characters for the message
+  include_diff: true      # Compare with yesterday where possible
+  tone: friendly          # friendly | concise | technical
+  emoji: true             # Include emoji in output
+  lang: en                # en | de — more languages available on request
+  timezone: UTC           # e.g. Europe/Berlin, America/New_York, Asia/Tokyo
+
+# Variants — customize which sources run for each briefing type
+# variants:
+#   morning:
+#     sources: [weather, calendar, github, reddit, news]
+#   evening:
+#     sources: [weather, news]
+#   weekly:
+#     sources: [weather, calendar, github, news, reddit]
