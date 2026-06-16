@@ -716,7 +716,7 @@ body {
 /* ── Extend / Plugin Section ── */
 
 .extend {
-  padding: 4rem 1rem;
+  padding: var(--space-xl) 2rem;
   max-width: var(--content-max);
   margin: 0 auto;
 }
