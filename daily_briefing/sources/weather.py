@@ -46,10 +46,8 @@ WEATHER_MAP: dict[int, str] = {
     99: "Thunderstorm with heavy hail",
 }
 
-# Default single location (fallback if no locations in brief.yaml)
-DEFAULT_LAT = float(os.environ.get("WEATHER_LAT", "50.1109"))
-DEFAULT_LON = float(os.environ.get("WEATHER_LON", "8.6821"))
-DEFAULT_NAME = os.environ.get("WEATHER_NAME", "Frankfurt")
+# DEFAULT_LAT/LON/NAME removed — locations are exclusively from brief.yaml
+# or the source config section.
 
 
 class WeatherSource(SourceProtocol):
@@ -65,9 +63,11 @@ class WeatherSource(SourceProtocol):
             locations = weather_cfg.get("locations", [])
 
             if not locations:
-                # Fallback to single env-var location
-                data = self._fetch_one(DEFAULT_LAT, DEFAULT_LON, DEFAULT_NAME)
-                return SourceResult(name=self.name, priority=10, data=data)
+                return SourceResult(
+                    name=self.name,
+                    priority=10,
+                    error="Weather not configured. Add locations to sources.weather.locations in brief.yaml",
+                )
 
             # Fetch all locations
             all_data = {}
