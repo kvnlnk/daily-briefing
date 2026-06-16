@@ -47,6 +47,12 @@
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-full: 9999px;
+
+  /* Code blocks */
+  --code-bg: #111;
+  --code-text: #e2e8f0;
+  --code-radius: 6px;
+  --code-font: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -681,7 +687,7 @@ body {
 
   .integrations { padding: var(--space-lg) 0.75rem; }
   .integrations__grid { gap: 1rem; }
-  .integrations__code code { font-size: 0.72rem; padding: 0.5rem 0.6rem; white-space: nowrap; }
+  .integrations__code code { white-space: nowrap; }
 
   .demo { padding: var(--space-lg) 0.75rem; }
   .extend { padding: var(--space-lg) 0.75rem; }
@@ -716,12 +722,13 @@ body {
 }
 
 .extend__code pre {
-  background: #111;
-  color: #eee;
+  background: var(--code-bg);
+  color: var(--code-text);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: var(--code-radius);
   overflow-x: auto;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  font-family: var(--code-font);
 }
 
 .extend__caption {
@@ -1113,11 +1120,11 @@ body {
 .integrations__code code {
   display: block;
   padding: 0.6rem 0.85rem;
-  background: #111;
-  color: #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  font-family: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+  background: var(--code-bg);
+  color: var(--code-text);
+  border-radius: var(--code-radius);
+  font-size: 0.82rem;
+  font-family: var(--code-font);
   overflow-x: auto;
   white-space: nowrap;
 }
