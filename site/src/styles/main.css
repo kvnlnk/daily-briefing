@@ -69,7 +69,7 @@ body {
 .nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 100;
+  z-index: 1001;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -136,7 +136,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   position: relative;
-  z-index: 101;
+  z-index: 1000;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -685,13 +685,13 @@ body {
     justify-content: center;
     align-items: center;
     gap: 2rem;
-    background: rgba(11, 13, 26, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(11, 13, 26, 1);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
-    z-index: 100;
+    z-index: 999;
   }
   .nav__links a {
     font-size: 1.2rem;
