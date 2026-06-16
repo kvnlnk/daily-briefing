@@ -17,12 +17,7 @@ import requests
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
-# Default feeds (user overrides in .env or brief.yaml)
-# heise.de: German tech news | dev.to: developer community
-DEFAULT_FEEDS = os.environ.get(
-    "NEWS_FEEDS",
-    "https://www.heise.de/rss/heise-atom.xml,https://dev.to/feed",
-)
+# DEFAULT_FEEDS removed — feeds are exclusively from brief.yaml or ENV
 MAX_ITEMS_PER_FEED = 3
 
 
@@ -34,7 +29,13 @@ class NewsSource(SourceProtocol):
     def fetch(self, config: dict[str, Any]) -> SourceResult:
         """Fetch headlines from all configured feeds."""
         source_config = config.get("sources", {}).get("news", {})
-        feeds_raw = source_config.get("feeds", DEFAULT_FEEDS)
+        feeds_raw = source_config.get("feeds", None)
+        if not feeds_raw:
+            return SourceResult(
+                name=self.name,
+                priority=60,
+                error="No news feeds configured. Add sources.news.feeds to brief.yaml",
+            )
         if isinstance(feeds_raw, str):
             feed_urls = [u.strip() for u in feeds_raw.split(",") if u.strip()]
         else:
