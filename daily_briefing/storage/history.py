@@ -114,15 +114,39 @@ def diff(
 
     # Weather: compare temperature
     if "weather" in today and "weather" in yesterday:
-        t_temp = today["weather"].get("temperature")
-        y_temp = yesterday["weather"].get("temperature")
-        if t_temp is not None and y_temp is not None:
-            diff_val = round(t_temp - y_temp, 1)
-            direction = "wärmer" if diff_val > 0 else "kälter" if diff_val < 0 else "gleich"
-            changes["weather"] = {
-                "temperature_diff": diff_val,
-                "note": f"{abs(diff_val)}°C {direction} als gestern" if diff_val != 0 else "Temperatur unverändert",
-            }
+        t_data = today["weather"]
+        y_data = yesterday["weather"]
+
+        # Multi-location mode: {"locations": {"City": {...}}}
+        if "locations" in t_data and "locations" in y_data:
+            loc_diffs = {}
+            all_locations = set(t_data["locations"]) | set(y_data["locations"])
+            for loc in sorted(all_locations):
+                t_loc = t_data["locations"].get(loc, {})
+                y_loc = y_data["locations"].get(loc, {})
+                t_temp = t_loc.get("temperature")
+                y_temp = y_loc.get("temperature")
+                if t_temp is not None and y_temp is not None:
+                    diff_val = round(t_temp - y_temp, 1)
+                    direction = "warmer" if diff_val > 0 else "colder" if diff_val < 0 else "same"
+                    loc_diffs[loc] = {
+                        "temperature_diff": diff_val,
+                        "note": f"{abs(diff_val)}C {direction} than yesterday" if diff_val != 0 else "Temperature unchanged",
+                    }
+            if loc_diffs:
+                changes["weather"] = {"locations": loc_diffs}
+
+        # Single-location mode: top-level "temperature"
+        elif "temperature" in t_data and "temperature" in y_data:
+            t_temp = t_data["temperature"]
+            y_temp = y_data["temperature"]
+            if t_temp is not None and y_temp is not None:
+                diff_val = round(t_temp - y_temp, 1)
+                direction = "wärmer" if diff_val > 0 else "kälter" if diff_val < 0 else "gleich"
+                changes["weather"] = {
+                    "temperature_diff": diff_val,
+                    "note": f"{abs(diff_val)}°C {direction} als gestern" if diff_val != 0 else "Temperatur unverändert",
+                }
 
     # GitHub: compare issue/PR counts
     if "github" in today and "github" in yesterday:
