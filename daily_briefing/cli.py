@@ -28,11 +28,27 @@ from daily_briefing.summarizer.prompts import build_prompt
 @click.option("--config", "-c", "config_path", default=None, help="Path to brief.yaml")
 @click.option("--json", "json_output", is_flag=True, help="Output raw JSON instead of formatted text")
 @click.option("--verbose", "-v", is_flag=True, help="Print debug information")
+@click.option("--list-sources", is_flag=True, help="List all installed data sources")
 @click.option("--log-level", default="WARNING", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]), help="Set logging level")
-def main(source: str | None, config_path: str | None, json_output: bool, verbose: bool, log_level: str) -> None:
+def main(source: str | None, config_path: str | None, json_output: bool, verbose: bool, log_level: str, list_sources: bool = False) -> None:
     """Fetch and display your daily briefing."""
 
     logging.basicConfig(level=getattr(logging, log_level.upper()), format="%(levelname)s:%(name)s:%(message)s")
+
+    # List sources mode
+    if list_sources:
+        from daily_briefing.orchestrator import discover_sources
+        eps = discover_sources()
+        click.echo("Installed sources:")
+        for name in sorted(eps.keys()):
+            ep = eps[name]
+            try:
+                cls = ep.load()
+                src = cls()
+                click.echo(f"  {name:15} {'(built-in)' if name in ('weather','github','calendar','bahn','reddit','news','email') else '(third-party)'}")
+            except Exception:
+                click.echo(f"  {name:15} (failed to load)")
+        return
 
     configuration = load_config(config_path)
 
