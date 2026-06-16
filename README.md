@@ -208,4 +208,4 @@ MIT
 
 ---
 
-<p align="center">Made with ❤️ by <a href="https://github.com/kvnlnk">kvnlnk</a></p>
+<p align="center">Made by <a href="https://kevinlingk.com">kvnlnk</a> &mdash; <a href="https://daily-briefing-site.vercel.app">daily-briefing-site.vercel.app</a></p>

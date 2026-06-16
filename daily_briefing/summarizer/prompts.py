@@ -104,7 +104,7 @@ def _simplify_data(source_name: str, data: dict[str, Any]) -> dict[str, Any]:
         # Single location
         if "location" in data:
             for key in ("location", "temperature", "feels_like", "humidity",
-                         "wind_speed", "precipitation", "condition", "emoji",
+                         "wind_speed", "precipitation", "condition",
                          "high", "low", "rain_chance"):
                 if key in data:
                     simplified[key] = data[key]

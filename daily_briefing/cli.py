@@ -47,7 +47,7 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
     if verbose:
         click.echo(f"Fetched {len(results)} sources:", err=True)
         for r in results:
-            status = "✅" if r.is_success() else "❌"
+            status = "[ok]" if r.is_success() else "[err]"
             click.echo(f"  {status} {r.name}", err=True)
 
     # Save to history

@@ -13,37 +13,37 @@ import requests
 
 from daily_briefing.sources.base import SourceProtocol, SourceResult
 
-# WMO Weather interpretation codes → human-readable + emoji
+# WMO Weather interpretation codes → human-readable
 # Source: https://open-meteo.com/en/docs#weathervariables
-WEATHER_MAP: dict[int, tuple[str, str]] = {
-    0: ("Clear", "☀️"),
-    1: ("Mainly clear", "🌤️"),
-    2: ("Partly cloudy", "⛅"),
-    3: ("Overcast", "☁️"),
-    45: ("Foggy", "🌫️"),
-    48: ("Depositing rime fog", "🌫️"),
-    51: ("Light drizzle", "🌦️"),
-    53: ("Moderate drizzle", "🌦️"),
-    55: ("Dense drizzle", "🌧️"),
-    56: ("Light freezing drizzle", "🌧️"),
-    57: ("Dense freezing drizzle", "🌧️"),
-    61: ("Slight rain", "🌧️"),
-    63: ("Moderate rain", "🌧️"),
-    65: ("Heavy rain", "🌧️"),
-    66: ("Light freezing rain", "🌧️"),
-    67: ("Heavy freezing rain", "🌧️"),
-    71: ("Slight snow", "🌨️"),
-    73: ("Moderate snow", "🌨️"),
-    75: ("Heavy snow", "🌨️"),
-    77: ("Snow grains", "🌨️"),
-    80: ("Slight rain showers", "🌦️"),
-    81: ("Moderate rain showers", "🌧️"),
-    82: ("Violent rain showers", "⛈️"),
-    85: ("Slight snow showers", "🌨️"),
-    86: ("Heavy snow showers", "🌨️"),
-    95: ("Thunderstorm", "⛈️"),
-    96: ("Thunderstorm with slight hail", "⛈️"),
-    99: ("Thunderstorm with heavy hail", "⛈️"),
+WEATHER_MAP: dict[int, str] = {
+    0: "Clear",
+    1: "Mainly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Foggy",
+    48: "Depositing rime fog",
+    51: "Light drizzle",
+    53: "Moderate drizzle",
+    55: "Dense drizzle",
+    56: "Light freezing drizzle",
+    57: "Dense freezing drizzle",
+    61: "Slight rain",
+    63: "Moderate rain",
+    65: "Heavy rain",
+    66: "Light freezing rain",
+    67: "Heavy freezing rain",
+    71: "Slight snow",
+    73: "Moderate snow",
+    75: "Heavy snow",
+    77: "Snow grains",
+    80: "Slight rain showers",
+    81: "Moderate rain showers",
+    82: "Violent rain showers",
+    85: "Slight snow showers",
+    86: "Heavy snow showers",
+    95: "Thunderstorm",
+    96: "Thunderstorm with slight hail",
+    99: "Thunderstorm with heavy hail",
 }
 
 # Default single location (fallback if no locations in brief.yaml)
@@ -118,7 +118,7 @@ class WeatherSource(SourceProtocol):
         daily = body.get("daily", {})
 
         weather_code = current.get("weather_code", 0)
-        condition, emoji = WEATHER_MAP.get(weather_code, ("Unknown", "❓"))
+        condition = WEATHER_MAP.get(weather_code, "Unknown")
 
         return {
             "location": name,
@@ -128,7 +128,6 @@ class WeatherSource(SourceProtocol):
             "wind_speed": current.get("wind_speed_10m"),
             "precipitation": current.get("precipitation"),
             "condition": condition,
-            "emoji": emoji,
             "weather_code": weather_code,
             # Today's forecast
             "high": daily.get("temperature_2m_max", [None])[0] if daily.get("temperature_2m_max") else None,
