@@ -47,7 +47,8 @@ class CalendarSource(SourceProtocol):
                 or os.environ.get("GOOGLE_TOKEN_PATH", None)
                 or DEFAULT_TOKEN_PATH
             )
-            events = self._get_events(token_path)
+            tz_name = config.get("output", {}).get("timezone", "Europe/Berlin")
+            events = self._get_events(token_path, tz_name)
             return SourceResult(
                 name=self.name,
                 priority=20,
@@ -76,7 +77,7 @@ class CalendarSource(SourceProtocol):
                 error=f"Calendar error: {error_msg}",
             )
 
-    def _get_events(self, token_path: str) -> list[dict[str, Any]]:
+    def _get_events(self, token_path: str, tz_name: str = "Europe/Berlin") -> list[dict[str, Any]]:
         """Fetch today's events from Google Calendar."""
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
@@ -89,7 +90,6 @@ class CalendarSource(SourceProtocol):
         service = build("calendar", "v3", credentials=creds)
 
         # Time range: midnight to midnight in user's timezone
-        tz_name = os.environ.get("TZ", "Europe/Berlin")
         tz = ZoneInfo(tz_name)
         now = datetime.datetime.now(datetime.timezone.utc)
         today_start = today_start_in_tz(now, tz)

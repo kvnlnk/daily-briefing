@@ -88,7 +88,7 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
         return
 
     # Build LLM prompt
-    prompt = build_prompt(results, yesterday_diff, configuration.output)
+    prompt = build_prompt(results, yesterday_diff, configuration.output, lang=configuration.output.lang)
 
     if verbose:
         click.echo("=== LLM PROMPT ===")

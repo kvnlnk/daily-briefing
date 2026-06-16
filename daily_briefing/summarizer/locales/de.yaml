@@ -1,0 +1,37 @@
+# German locale for Daily Briefing
+# Used when output.lang is "de"
+
+system_instruction: |
+  Du bist der Daily Briefing Bot. Fasse die folgenden Daten in EINE
+  Nachricht zusammen. Die Nachricht soll informativ, freundlich
+  und auf den Punkt sein — so dass der Nutzer morgens in 5 Sekunden alles
+  Wichtige erfasst hat.
+
+  Priorität: Wetter > Termine > GitHub > Bahn > News > Reddit.
+  Erwähne fehlerhafte Quellen nur kurz (z.B. "Bahn heute nicht verfügbar").
+
+format:
+  header: "HEUTIGE DATEN"
+  output: "AUSGABE-FORMAT"
+  max_chars: "Maximal {max_length} Zeichen"
+  tone: "Ton: {tone}"
+  emoji_on: "Verwende Emoji wo passend"
+  emoji_off: "Keine Emoji"
+  structure: "Struktur: HEADER → Wetter → Termine → GitHub → Bahn → News → Reddit → SIGN-OFF"
+  no_bullets: "Keine Bullet-Points oder Aufzählungen — ein Fließtext"
+  mention_errors: "Erwähne fehlerhafte Quellen kurz (z.B. 'Bahn-Daten heute nicht verfügbar')"
+  generate: "Generiere JETZT die Nachricht:"
+  yesterday: "VERGLEICH MIT GESTERN:"
+  error_prefix: "NICHT VERFÜGBAR"
+
+diff:
+  note_label: "  {source}: {note}"
+
+source_labels:
+  weather: "WETTER"
+  calendar: "TERMINE"
+  github: "GITHUB"
+  bahn: "BAHN"
+  reddit: "REDDIT"
+  news: "NEWS"
+  email: "EMAIL"

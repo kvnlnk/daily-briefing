@@ -61,6 +61,7 @@ class WeatherSource(SourceProtocol):
             # Read locations from brief.yaml or use default
             weather_cfg = config.get("sources", {}).get("weather", {})
             locations = weather_cfg.get("locations", [])
+            tz_name = config.get("output", {}).get("timezone", "Europe/Berlin")
 
             if not locations:
                 return SourceResult(
@@ -76,7 +77,7 @@ class WeatherSource(SourceProtocol):
                 lon = loc.get("lon")
                 name = loc.get("name", "Unknown")
                 if lat is not None and lon is not None:
-                    all_data[name] = self._fetch_one(float(lat), float(lon), name)
+                    all_data[name] = self._fetch_one(float(lat), float(lon), name, tz_name)
 
             return SourceResult(
                 name=self.name,
@@ -96,14 +97,14 @@ class WeatherSource(SourceProtocol):
                 error=f"Weather data parse error: {e}",
             )
 
-    def _fetch_one(self, lat: float, lon: float, name: str) -> dict[str, Any]:
+    def _fetch_one(self, lat: float, lon: float, name: str, tz_name: str = "Europe/Berlin") -> dict[str, Any]:
         """Fetch weather for a single location."""
         params = {
             "latitude": lat,
             "longitude": lon,
             "current": "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation",
             "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
-            "timezone": "Europe/Berlin",
+            "timezone": tz_name,
             "forecast_days": 1,
         }
         resp = requests.get(

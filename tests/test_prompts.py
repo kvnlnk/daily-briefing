@@ -20,8 +20,8 @@ class TestBuildPrompt:
             SourceResult(name="bahn", priority=40, error="API timeout"),
         ]
         prompt = build_prompt(results, config=OutputConfig(max_length=200))
-        # Error sources should appear with NICHT VERFUEGBAR marker
-        assert "NICHT" in prompt or "VERF" in prompt or "bahn" in prompt.lower()
+        # Error sources should appear with error marker
+        assert "NOT AVAILABLE" in prompt or "TRANSIT" in prompt or "bahn" in prompt.lower()
 
     def test_respects_max_length(self):
         results = [
