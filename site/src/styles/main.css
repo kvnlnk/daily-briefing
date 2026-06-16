@@ -120,6 +120,47 @@ body {
   box-shadow: 0 4px 20px rgba(212, 120, 10, 0.4);
 }
 
+/* ── Mobile Overlay (body-level, always fixed) ── */
+
+.nav__overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: rgba(11, 13, 26, 1);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.nav__overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.nav__overlay-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+.nav__overlay-links a {
+  font-size: 1.2rem;
+  padding: 0.75rem 1.5rem;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  border-radius: 12px;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav__overlay-links a:hover,
+.nav__overlay-links a:active {
+  background: rgba(255,255,255,0.08);
+  color: var(--cream);
+}
+
 /* ── Burger Menu Button (mobile only) ── */
 
 .nav__burger {
@@ -676,40 +717,12 @@ body {
 @media (max-width: 768px) {
   .nav { padding: 0.75rem 1.25rem; }
 
-  /* Show burger, hide links by default */
+  /* Show burger, hide desktop links */
   .nav__burger { display: flex; }
-  .nav__links {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    background: rgba(11, 13, 26, 1);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 999;
-  }
-  .nav__links a {
-    font-size: 1.2rem;
-    padding: 0.75rem 1.5rem;
-    color: rgba(255,255,255,0.85);
-    border-radius: 12px;
-    transition: background 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .nav__links a:hover,
-  .nav__links a:active {
-    background: rgba(255,255,255,0.08);
-    color: var(--cream);
-  }
-  .nav--open .nav__links {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  .nav .nav__links { display: none; }
+
+  /* Show overlay as flex (hidden via opacity/pointer-events) */
+  .nav__overlay { display: flex; }
 
   .hero { padding: 5rem 1.25rem 3rem; }
   .hero__actions { flex-direction: column; align-items: center; }

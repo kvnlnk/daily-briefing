@@ -268,19 +268,21 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCarouselDots();
 
   /* ── Burger menu toggle ── */
-  const nav = document.getElementById('nav');
   const burger = document.getElementById('navBurger');
-  const navLinks = document.getElementById('navLinks');
-  if (burger && nav && navLinks) {
-    burger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = nav.classList.toggle('nav--open');
+  const overlay = document.getElementById('navOverlay');
+  if (burger && overlay) {
+    burger.addEventListener('click', () => {
+      const isOpen = overlay.classList.toggle('visible');
       burger.setAttribute('aria-expanded', isOpen);
+      overlay.setAttribute('aria-hidden', !isOpen);
     });
     // Close menu when a link is tapped
-    navLinks.addEventListener('click', () => {
-      nav.classList.remove('nav--open');
-      burger.setAttribute('aria-expanded', 'false');
+    overlay.addEventListener('click', (e) => {
+      if (e.target.closest('a')) {
+        overlay.classList.remove('visible');
+        burger.setAttribute('aria-expanded', 'false');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
     });
   }
 });
