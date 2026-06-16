@@ -33,6 +33,9 @@ histfile
 # Personal config — each user creates their own
 brief.yaml
 
+# Internal planning docs — not for public repo
+docs/superpowers/
+
 # Site (Vite build output)
 site/dist/
 site/node_modules/
