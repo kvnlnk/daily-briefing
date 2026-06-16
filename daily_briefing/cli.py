@@ -17,6 +17,7 @@ from typing import Any
 import click
 
 from daily_briefing.config import load_config
+from daily_briefing.delivery import deliver
 from daily_briefing.orchestrator import fetch_all, fetch_single
 from daily_briefing.sources.base import SourceResult
 from daily_briefing.storage.history import diff, load, save
@@ -102,7 +103,13 @@ def main(source: str | None, config_path: str | None, json_output: bool, verbose
         summary = summarizer.summarize(prompt)
 
         if summary.is_success():
-            click.echo(summary.text)
+            delivery_configs = configuration.raw.get("delivery", [{"method": "stdout"}])
+            if not delivery_configs:
+                delivery_configs = [{"method": "stdout"}]  # always fall back
+            results = deliver(summary.text, delivery_configs)
+            for r in results:
+                if not r.success:
+                    click.echo(f"Delivery failed ({r.channel}): {r.error}", err=True)
         else:
             click.echo(f"Summarizer error ({provider_name}): {summary.error}", err=True)
             click.echo("")  # Fallback: print the raw prompt
