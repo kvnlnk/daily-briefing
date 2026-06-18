@@ -230,24 +230,7 @@ function setupCarouselDots() {
   const cards = grid.querySelectorAll('.integrations__card');
   if (cards.length === 0) return;
 
-  let snapPositions = [];
-
-  function recomputeSnapPositions() {
-    const gridRect = grid.getBoundingClientRect();
-    snapPositions = Array.from(cards).map(c => {
-      const rect = c.getBoundingClientRect();
-      return rect.left - gridRect.left + grid.scrollLeft;
-    });
-  }
-  recomputeSnapPositions();
-
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(recomputeSnapPositions, 150);
-  });
-
-  // Create dot for each card
+  // Create one dot per card
   cards.forEach(() => {
     const dot = document.createElement('span');
     dots.appendChild(dot);
@@ -257,36 +240,43 @@ function setupCarouselDots() {
 
   // Hide dots when there's no overflow (desktop)
   function updateDotsVisibility() {
-    const hasOverflow = grid.scrollWidth > grid.clientWidth;
-    dots.style.display = hasOverflow ? '' : 'none';
+    dots.style.display = grid.scrollWidth > grid.clientWidth ? '' : 'none';
   }
   updateDotsVisibility();
   window.addEventListener('resize', updateDotsVisibility);
 
-  // Update active dot on scroll
+  // Determine which card is snapped by comparing each card's left edge
+  // to the grid's visible left edge — all in viewport coordinates via getBoundingClientRect.
+  // scroll-snap-align: start guarantees the snapped card's left edge matches the grid's left edge.
+  function getActiveIndex() {
+    const gridLeft = grid.getBoundingClientRect().left;
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    cards.forEach((card, i) => {
+      const dist = Math.abs(card.getBoundingClientRect().left - gridLeft);
+      if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+    });
+    return bestIdx;
+  }
+
+  // Update dots on scroll
   let ticking = false;
   grid.addEventListener('scroll', () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
-        const left = grid.scrollLeft;
-        const maxScroll = grid.scrollWidth - grid.clientWidth;
-
-        // If at the very end, always show last dot
-        if (maxScroll > 0 && left >= maxScroll - 5) {
-          allDots.forEach((d, i) => d.classList.toggle('active', i === cards.length - 1));
-        } else {
-          let bestIdx = 0;
-          let bestDist = Infinity;
-          snapPositions.forEach((pos, i) => {
-            const dist = Math.abs(pos - left);
-            if (dist < bestDist) { bestDist = dist; bestIdx = i; }
-          });
-          allDots.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
-        }
+        const activeIdx = getActiveIndex();
+        allDots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
         ticking = false;
       });
       ticking = true;
     }
+  });
+
+  // Re-check on resize (layout may shift active card)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateDotsVisibility, 150);
   });
 }
 
