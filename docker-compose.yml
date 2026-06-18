@@ -1,0 +1,19 @@
+services:
+  briefing:
+    # Uses the pre-built image from GHCR
+    # After first push, set the package to public at:
+    # https://github.com/kvnlnk/daily-briefing/pkgs/container/daily-briefing
+    image: ghcr.io/kvnlnk/daily-briefing:latest
+    container_name: daily-briefing
+    command: ["daily-briefing", "daemon"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./brief.yaml:/app/brief.yaml:ro
+      # Optional: mount a data directory for history persistence
+      # - ./data:/app/data
+      # Optional: mount Google OAuth token for calendar source
+      # - ~/.google_token.json:/home/appuser/.google_token.json:ro
+    environment:
+      - BRIEF_CONFIG=/app/brief.yaml
