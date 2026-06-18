@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 from typing import Any
 
@@ -82,6 +83,51 @@ def doctor(ctx: click.Context) -> None:
     """Check configuration and credentials."""
     config_path = ctx.obj.get("config_path")
     run_doctor(config_path=config_path)
+
+
+@cli.command()
+@click.option("--at", "at_time", default="07:00", help="Trigger time in HH:MM (24h)")
+@click.option("--once", is_flag=True, help="Run once immediately then exit")
+@click.pass_context
+def daemon(ctx: click.Context, at_time: str, once: bool) -> None:
+    """Run daily-briefing as a persistent daemon.
+
+    Triggers the briefing once daily at the configured time.
+    Default: once every day at 07:00 (configurable via --at or BRIEFING_SCHEDULE env var).
+    """
+    import zoneinfo
+    from datetime import datetime, time as time_mod
+
+    from daily_briefing.scheduler import seconds_until_next_run
+
+    config_path = ctx.obj.get("config_path")
+    configuration = load_config(config_path)
+    tz_name = configuration.output.timezone
+    tz = zoneinfo.ZoneInfo(tz_name)
+
+    # Allow env override
+    at_time = os.environ.get("BRIEFING_SCHEDULE", at_time)
+
+    if once:
+        click.echo("Running briefing once (--once)...")
+        _run_briefing_standalone(config_path)
+        return
+
+    click.echo(f"🕐 Daily Briefing daemon — next trigger at {at_time} ({tz_name})")
+    click.echo("Press Ctrl+C to stop.")
+    click.echo("")
+
+    while True:
+        now = datetime.now(tz)
+        wait = seconds_until_next_run(now, at_time, tz)
+        next_dt = datetime.fromtimestamp(now.timestamp() + wait, tz=tz)
+        click.echo(
+            f"  [sleeping {wait/3600:.1f}h until {next_dt.strftime('%H:%M %Z')}]",
+            err=True,
+        )
+        import time as time_module
+        time_module.sleep(wait)
+        _run_briefing_standalone(config_path)
 
 
 # ── Core briefing logic ──────────────────────────────────────────────
@@ -185,6 +231,36 @@ def _run_briefing(ctx: click.Context) -> None:
     except ValueError as e:
         click.echo(f"Configuration error: {e}", err=True)
         click.echo(prompt)
+
+
+def _run_briefing_standalone(config_path: str | None = None) -> None:
+    """Run the briefing pipeline without a click context (for daemon)."""
+    from daily_briefing.orchestrator import fetch_all
+
+    try:
+        configuration = load_config(config_path)
+        results = fetch_all(configuration)
+        prompt = build_prompt(
+            results,
+            None,
+            configuration.output,
+            lang=configuration.output.lang,
+            variant="morning",
+        )
+        provider_name = configuration.raw.get("summarizer", {}).get(
+            "provider", "prompt-only"
+        )
+        summarizer = get_summarizer(provider_name)
+        summary = summarizer.summarize(prompt)
+        if summary.is_success():
+            delivery_configs = configuration.raw.get(
+                "delivery", [{"method": "stdout"}]
+            )
+            deliver(summary.text, delivery_configs)
+        else:
+            click.echo(f"Summarizer error: {summary.error}", err=True)
+    except Exception as e:
+        click.echo(f"Briefing failed: {e}", err=True)
 
 
 def _list_sources() -> None:
