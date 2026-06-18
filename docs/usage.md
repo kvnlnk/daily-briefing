@@ -162,81 +162,67 @@ journalctl --user -u daily-briefing.service -f
 - A `brief.yaml` configuration file
 - A `.env` file with your secrets
 
-### Dockerfile
-
-Create a `Dockerfile` in your project directory:
-
-```dockerfile
-FROM python:3.11-slim
-
-RUN pip install --no-cache-dir git+https://github.com/kvnlnk/daily-briefing.git
-
-WORKDIR /app
-COPY brief.yaml .env ./
-
-CMD ["daily-briefing", "--variant", "morning"]
-```
-
-Build and run:
-
-```bash
-docker build -t daily-briefing .
-docker run --rm daily-briefing
-```
-
-### docker-compose.yml (recommended)
-
-For cron scheduling inside Docker, use `docker-compose.yml` with environment variables and a cron container:
-
-```yaml
-version: "3.8"
-
-services:
-  briefing:
-    build: .
-    image: daily-briefing
-    container_name: daily-briefing
-    env_file: .env
-    volumes:
-      - ./brief.yaml:/app/brief.yaml:ro
-      - ./data:/app/data        # persists history SQLite DB
-    command: ["daily-briefing", "--variant", "morning"]
-    restart: "no"
-
-  # Optional: run on a schedule using ofelia (https://github.com/mcuadros/ofelia)
-  scheduler:
-    image: mcuadros/ofelia:latest
-    depends_on:
-      - briefing
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    command: daemon --docker
-    restart: unless-stopped
-    labels:
-      ofelia.job-run.briefing.schedule: "0 7 * * *"
-      ofelia.job-run.briefing.container: "daily-briefing"
-```
-
-### Run once manually
+### One-shot run (pull & run)
 
 ```bash
 docker run --rm \
   --env-file .env \
   -v $(pwd)/brief.yaml:/app/brief.yaml:ro \
-  daily-briefing \
-  daily-briefing --variant morning
+  ghcr.io/kvnlnk/daily-briefing
 ```
 
-### Using a pre-built image
+The `--rm` flag removes the container after it finishes. Your config and secrets stay on the host — nothing is baked into the image.
 
-If you push to a registry, the run command becomes:
+### Continuous daemon with Docker Compose
+
+For automatic daily runs at your configured time, use the included `docker-compose.yml`:
 
 ```bash
+docker compose up -d
+
+# Check logs
+docker compose logs -f briefing
+
+# Stop
+docker compose down
+```
+
+The daemon sleeps until the next scheduled time, runs the briefing, delivers it, then goes back to sleep. No external scheduler (cron, ofelia) needed.
+
+The compose file mounts your `brief.yaml` as a read-only volume and reads secrets from `.env`. By default it triggers at 07:00 — override with `BRIEFING_SCHEDULE` in your `.env`:
+
+```dotenv
+BRIEFING_SCHEDULE=06:30
+```
+
+### Build & run locally
+
+```bash
+git clone https://github.com/kvnlnk/daily-briefing.git
+cd daily-briefing
+docker build -t daily-briefing .
+
+# Run once
+docker run --rm --env-file .env \
+  -v $(pwd)/brief.yaml:/app/brief.yaml:ro \
+  daily-briefing
+
+# Run daemon
+docker run -d --restart unless-stopped \
+  --env-file .env \
+  -v $(pwd)/brief.yaml:/app/brief.yaml:ro \
+  daily-briefing daemon
+```
+
+### Using a pre-built image from GHCR
+
+```bash
+docker pull ghcr.io/kvnlnk/daily-briefing:latest
+
 docker run --rm \
   --env-file .env \
-  -v $(pwd)/brief.yaml:/brief.yaml:ro \
-  -e BRIEF_CONFIG=/brief.yaml \
-  ghcr.io/youruser/daily-briefing:latest
+  -v $(pwd)/brief.yaml:/app/brief.yaml:ro \
+  ghcr.io/kvnlnk/daily-briefing
 ```
 
 ---
