@@ -234,15 +234,10 @@ function setupCarouselDots() {
 
   function recomputeSnapPositions() {
     const gridRect = grid.getBoundingClientRect();
-    const maxScroll = grid.scrollWidth - grid.clientWidth;
     snapPositions = Array.from(cards).map(c => {
       const rect = c.getBoundingClientRect();
-      const pos = rect.left - gridRect.left + grid.scrollLeft;
-      // Cap at max scroll — cards beyond the scrollable range snap to the end
-      return Math.min(pos, maxScroll);
+      return rect.left - gridRect.left + grid.scrollLeft;
     });
-    // Ensure the last position is always exactly maxScroll
-    if (snapPositions.length > 0) snapPositions[snapPositions.length - 1] = maxScroll;
   }
   recomputeSnapPositions();
 
