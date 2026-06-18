@@ -234,7 +234,12 @@ function setupCarouselDots() {
   let snapPositions = [];
 
   function recomputeSnapPositions() {
-    snapPositions = Array.from(cards).map(c => c.offsetLeft);
+    const gridRect = grid.getBoundingClientRect();
+    snapPositions = Array.from(cards).map(c => {
+      const rect = c.getBoundingClientRect();
+      // Position relative to grid's scrollable content area
+      return rect.left - gridRect.left + grid.scrollLeft;
+    });
   }
   recomputeSnapPositions();
 
