@@ -230,6 +230,21 @@ function setupCarouselDots() {
   const cards = grid.querySelectorAll('.integrations__card');
   if (cards.length === 0) return;
 
+  // Build snap-position map once (cards can only reflow on resize)
+  let snapPositions = [];
+
+  function recomputeSnapPositions() {
+    snapPositions = Array.from(cards).map(c => c.offsetLeft);
+  }
+  recomputeSnapPositions();
+
+  // Refresh on resize (layout may shift)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(recomputeSnapPositions, 150);
+  });
+
   // Create dot for each card
   cards.forEach(() => {
     const dot = document.createElement('span');
@@ -238,15 +253,28 @@ function setupCarouselDots() {
   const allDots = dots.querySelectorAll('span');
   if (allDots.length > 0) allDots[0].classList.add('active');
 
-  // Update active dot on scroll
+  // Hide dots entirely when there's no overflow (desktop)
+  function updateDotsVisibility() {
+    const hasOverflow = grid.scrollWidth > grid.clientWidth;
+    dots.style.display = hasOverflow ? '' : 'none';
+  }
+  updateDotsVisibility();
+  window.addEventListener('resize', updateDotsVisibility);
+
+  // Update active dot on scroll — find the nearest snap position
   let ticking = false;
   grid.addEventListener('scroll', () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
-        const scrollLeft = grid.scrollLeft;
-        const cardWidth = grid.scrollWidth / cards.length;
-        const activeIdx = Math.round(scrollLeft / cardWidth);
-        allDots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+        const left = grid.scrollLeft;
+        // Find the card whose offsetLeft is closest to scrollLeft
+        let bestIdx = 0;
+        let bestDist = Infinity;
+        snapPositions.forEach((pos, i) => {
+          const dist = Math.abs(pos - left);
+          if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+        });
+        allDots.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
         ticking = false;
       });
       ticking = true;
