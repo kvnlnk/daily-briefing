@@ -29,6 +29,9 @@ dev = [
 [tool.setuptools.packages.find]
 include = ["daily_briefing*"]
 
+[tool.setuptools.package-data]
+daily_briefing = ["summarizer/locales/*.yaml"]
+
 [project.entry-points."daily_briefing.sources"]
 weather = "daily_briefing.sources.weather:WeatherSource"
 github = "daily_briefing.sources.github:GitHubSource"
