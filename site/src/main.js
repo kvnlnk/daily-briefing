@@ -230,20 +230,22 @@ function setupCarouselDots() {
   const cards = grid.querySelectorAll('.integrations__card');
   if (cards.length === 0) return;
 
-  // Build snap-position map once (cards can only reflow on resize)
   let snapPositions = [];
 
   function recomputeSnapPositions() {
     const gridRect = grid.getBoundingClientRect();
+    const maxScroll = grid.scrollWidth - grid.clientWidth;
     snapPositions = Array.from(cards).map(c => {
       const rect = c.getBoundingClientRect();
-      // Position relative to grid's scrollable content area
-      return rect.left - gridRect.left + grid.scrollLeft;
+      const pos = rect.left - gridRect.left + grid.scrollLeft;
+      // Cap at max scroll — cards beyond the scrollable range snap to the end
+      return Math.min(pos, maxScroll);
     });
+    // Ensure the last position is always exactly maxScroll
+    if (snapPositions.length > 0) snapPositions[snapPositions.length - 1] = maxScroll;
   }
   recomputeSnapPositions();
 
-  // Refresh on resize (layout may shift)
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
@@ -258,7 +260,7 @@ function setupCarouselDots() {
   const allDots = dots.querySelectorAll('span');
   if (allDots.length > 0) allDots[0].classList.add('active');
 
-  // Hide dots entirely when there's no overflow (desktop)
+  // Hide dots when there's no overflow (desktop)
   function updateDotsVisibility() {
     const hasOverflow = grid.scrollWidth > grid.clientWidth;
     dots.style.display = hasOverflow ? '' : 'none';
@@ -266,20 +268,26 @@ function setupCarouselDots() {
   updateDotsVisibility();
   window.addEventListener('resize', updateDotsVisibility);
 
-  // Update active dot on scroll — find the nearest snap position
+  // Update active dot on scroll
   let ticking = false;
   grid.addEventListener('scroll', () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
         const left = grid.scrollLeft;
-        // Find the card whose offsetLeft is closest to scrollLeft
-        let bestIdx = 0;
-        let bestDist = Infinity;
-        snapPositions.forEach((pos, i) => {
-          const dist = Math.abs(pos - left);
-          if (dist < bestDist) { bestDist = dist; bestIdx = i; }
-        });
-        allDots.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
+        const maxScroll = grid.scrollWidth - grid.clientWidth;
+
+        // If at the very end, always show last dot
+        if (maxScroll > 0 && left >= maxScroll - 5) {
+          allDots.forEach((d, i) => d.classList.toggle('active', i === cards.length - 1));
+        } else {
+          let bestIdx = 0;
+          let bestDist = Infinity;
+          snapPositions.forEach((pos, i) => {
+            const dist = Math.abs(pos - left);
+            if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+          });
+          allDots.forEach((d, i) => d.classList.toggle('active', i === bestIdx));
+        }
         ticking = false;
       });
       ticking = true;
