@@ -266,17 +266,50 @@
   <section id="extend" class="extend">
     <h2 class="section-title">Extend It</h2>
     <p class="section-subtitle">Add any data source as a separate pip package. No fork needed.</p>
-    <div class="extend__code">
-<pre><code>class MySource(SourceProtocol):
-    name = "my_source"
-    def fetch(self, config):
-        return SourceResult(name=self.name, ...)</code></pre>
+
+    <div class="extend__grid">
+      <article class="extend__card" style="--card-hue: 150">
+        <div class="extend__card-header">
+          <span class="extend__badge extend__badge--core">Core</span>
+          <h3 class="extend__card-title">Built-in Sources</h3>
+        </div>
+        <p class="extend__card-desc">7 sources ship with daily-briefing: Weather, Calendar, GitHub, Bahn, Reddit, News RSS, and Email. Zero setup for most.</p>
+      </article>
+
+      <article class="extend__card" style="--card-hue: 35">
+        <div class="extend__card-header">
+          <span class="extend__badge extend__badge--plugin">Plugin</span>
+          <h3 class="extend__card-title">Your Own Source</h3>
+        </div>
+        <p class="extend__card-desc">Write a class, register an entry point — your source auto-appears in <code>daily-briefing --list-sources</code>.</p>
+      </article>
     </div>
-    <p class="extend__caption">
-      Register via pyproject.toml entry point and it auto-appears in
-      <code>daily-briefing --list-sources</code>.
-      See the <a href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/source-authoring.md" target="_blank">source-authoring guide</a>.
-    </p>
+
+    <div class="extend__code-card">
+      <div class="extend__code-card-header">
+        <span class="extend__filename">my_source.py</span>
+        <span class="extend__lang">python</span>
+      </div>
+      <div class="extend__code">
+<pre><code><span class="hl-keyword">from</span> daily_briefing <span class="hl-keyword">import</span> <span class="hl-class">SourceProtocol</span>, <span class="hl-class">SourceResult</span>
+
+<span class="hl-keyword">class</span> <span class="hl-class">MySource</span>(<span class="hl-class">SourceProtocol</span>):
+    name = <span class="hl-string">"my_source"</span>
+
+    <span class="hl-keyword">def</span> <span class="hl-func">fetch</span>(<span class="hl-keyword">self</span>, config):
+        <span class="hl-comment"># Your data fetching logic here</span>
+        <span class="hl-keyword">return</span> <span class="hl-class">SourceResult</span>(name=<span class="hl-keyword">self</span>.name, ...)</code></pre>
+      </div>
+      <p class="extend__code-caption">Register via <code>pyproject.toml</code> → <code class="extend__entry-point">[project.entry-points."daily_briefing.sources"]</code></p>
+    </div>
+
+    <div class="extend__cta">
+      <p class="extend__cta-text">Build your first source in 5 minutes</p>
+      <div class="extend__cta-actions">
+        <a href="https://github.com/kvnlnk/daily-briefing/blob/main/docs/source-authoring.md" class="btn btn--primary" target="_blank">Source Authoring Guide →</a>
+        <a href="https://github.com/kvnlnk/daily-briefing" class="btn btn--secondary" target="_blank">GitHub ↗</a>
+      </div>
+    </div>
   </section>
 
   <section class="cta-section">
