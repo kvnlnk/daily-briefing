@@ -227,16 +227,16 @@ function setupCarouselDots() {
   const dots = document.getElementById('integrationsDots');
   if (!grid || !dots) return;
 
-  const cards = grid.querySelectorAll('.integrations__card');
-  if (cards.length === 0) return;
+  // 3 fixed dots — represents scroll position, not individual cards
+  const DOT_COUNT = 3;
 
-  // Create one dot per card
-  cards.forEach(() => {
+  // Create dots
+  for (let i = 0; i < DOT_COUNT; i++) {
     const dot = document.createElement('span');
     dots.appendChild(dot);
-  });
+  }
   const allDots = dots.querySelectorAll('span');
-  if (allDots.length > 0) allDots[0].classList.add('active');
+  allDots[0]?.classList.add('active');
 
   // Hide dots when there's no overflow (desktop)
   function updateDotsVisibility() {
@@ -245,18 +245,11 @@ function setupCarouselDots() {
   updateDotsVisibility();
   window.addEventListener('resize', updateDotsVisibility);
 
-  // Determine which card is snapped by comparing each card's left edge
-  // to the grid's visible left edge — all in viewport coordinates via getBoundingClientRect.
-  // scroll-snap-align: start guarantees the snapped card's left edge matches the grid's left edge.
-  function getActiveIndex() {
-    const gridLeft = grid.getBoundingClientRect().left;
-    let bestIdx = 0;
-    let bestDist = Infinity;
-    cards.forEach((card, i) => {
-      const dist = Math.abs(card.getBoundingClientRect().left - gridLeft);
-      if (dist < bestDist) { bestDist = dist; bestIdx = i; }
-    });
-    return bestIdx;
+  // Map scroll position to 0..DOT_COUNT-1 via linear interpolation
+  function indexFromScroll() {
+    const maxScroll = grid.scrollWidth - grid.clientWidth;
+    if (maxScroll <= 0) return 0;
+    return Math.round((grid.scrollLeft / maxScroll) * (DOT_COUNT - 1));
   }
 
   // Update dots on scroll
@@ -264,19 +257,12 @@ function setupCarouselDots() {
   grid.addEventListener('scroll', () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
-        const activeIdx = getActiveIndex();
+        const activeIdx = indexFromScroll();
         allDots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
         ticking = false;
       });
       ticking = true;
     }
-  });
-
-  // Re-check on resize (layout may shift active card)
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(updateDotsVisibility, 150);
   });
 }
 
