@@ -336,63 +336,42 @@ And in the run step:
 
 ## 5. Hermes Agent
 
-**When to use:** you already run [Hermes Agent](https://hermes-agent.nousresearch.com) and want the briefing as part of your autonomous agent workflow. Daily Briefing output can be piped into a Hermes cron job or skill.
+**When to use:** you already run [Hermes Agent](https://hermes-agent.nousresearch.com) and want the briefing as part of your autonomous agent workflow.
 
 > **Note:** Hermes is one option among many. Daily Briefing does not require Hermes — it's a fully standalone CLI tool.
 
-### Option A: Hermes cron job
-
-Create a cron entry that runs `daily-briefing` and stores the output for Hermes to pick up:
+### Install the skill
 
 ```bash
-# In your Hermes profile's cron/ directory
-# Save as: ~/.hermes/profiles/default/cron/briefing.sh
-
-#!/bin/bash
-# /root/.hermes/profiles/default/cron/briefing.sh
-daily-briefing --variant morning --json > /tmp/daily-briefing-latest.json
+cp integrations/hermes/briefing_skill.py ~/.hermes/profiles/default/skills/
 ```
 
-Make it executable and add a cron schedule:
+Then in a Hermes session:
+
+```
+/skill briefing_skill
+run_briefing()
+```
+
+### Hermes cron job
+
+Combine with Hermes' built-in cron scheduler:
 
 ```bash
-chmod +x ~/.hermes/profiles/default/cron/briefing.sh
-crontab -e
-# 0 7 * * * /root/.hermes/profiles/default/cron/briefing.sh
+hermes cron create --schedule "30 6 * * *" \
+  --prompt "Fetch the daily briefing using briefing_skill.run_full_briefing() and deliver the summary to me." \
+  --skills briefing_skill
 ```
 
-### Option B: Trigger from a Hermes skill
+### JSON output (no skill needed)
 
-A Hermes skill can invoke `daily-briefing` and use the JSON output as context:
+If you only need raw data:
 
-```python
-# ~/.hermes/profiles/default/skills/briefing.py
-import json
-import subprocess
-
-
-def run_briefing():
-    """Fetch today's briefing and return structured data."""
-    result = subprocess.run(
-        ["daily-briefing", "--json", "--dry-run"],
-        capture_output=True, text=True, timeout=30,
-    )
-    if result.returncode != 0:
-        return {"error": result.stderr}
-    return json.loads(result.stdout)
+```bash
+daily-briefing --json --dry-run
 ```
 
-### Option C: Webhook delivery
-
-If you've implemented a custom Hermes webhook sender for Daily Briefing's delivery protocol, configure it in `brief.yaml`:
-
-```yaml
-delivery:
-  - method: hermes_webhook
-    url: http://localhost:8080/webhook
-```
-
-(This requires a `hermes_webhook` entry in the delivery registry — see [docs/source-authoring.md](source-authoring.md) for the pattern.)
+This prints structured JSON to stdout — pipe it anywhere.
 
 ---
 
