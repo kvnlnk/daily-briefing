@@ -1061,11 +1061,11 @@ body {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 0.5rem 0 1rem;
-  /* Peek affordance: next card peeks at the right */
-  padding-right: 20vw;
+  /* Peek affordance: small right padding so next card peeks in */
+  padding-right: 1rem;
   /* Gradient fade on right edge to hint more content */
-  mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
+  mask-image: linear-gradient(to right, black calc(100% - 40px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 40px), transparent 100%);
 }
 .integrations__grid::-webkit-scrollbar { display: none; }
 
