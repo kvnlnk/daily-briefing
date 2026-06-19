@@ -96,7 +96,7 @@ def daemon(ctx: click.Context, at_time: str, once: bool) -> None:
     Default: once every day at 07:00 (configurable via --at or BRIEFING_SCHEDULE env var).
     """
     import zoneinfo
-    from datetime import datetime, time as time_mod
+    from datetime import datetime
 
     from daily_briefing.scheduler import seconds_until_next_run
 

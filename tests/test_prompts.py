@@ -1,5 +1,4 @@
 """Tests for summarizer/prompts — prompt building and data simplification."""
-import pytest
 from daily_briefing.summarizer.prompts import build_prompt, _simplify_data
 from daily_briefing.sources.base import SourceResult
 from daily_briefing.config import OutputConfig

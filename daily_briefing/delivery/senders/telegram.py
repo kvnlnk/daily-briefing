@@ -7,7 +7,6 @@ or config in brief.yaml delivery[] section.
 from __future__ import annotations
 
 import os
-from typing import Any
 
 import requests
 

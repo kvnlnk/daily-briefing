@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from daily_briefing.config import OutputConfig
 from daily_briefing.sources.base import SourceResult

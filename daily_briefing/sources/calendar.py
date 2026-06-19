@@ -79,8 +79,6 @@ class CalendarSource(SourceProtocol):
 
     def _get_events(self, token_path: str, tz_name: str = "Europe/Berlin") -> list[dict[str, Any]]:
         """Fetch today's events from Google Calendar."""
-        from google.auth.transport.requests import Request
-        from google.oauth2.credentials import Credentials
         from googleapiclient.discovery import build
 
         creds = self._load_credentials(token_path)

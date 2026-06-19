@@ -6,7 +6,6 @@ Requires NTFY_TOPIC env var or topic in brief.yaml delivery config.
 from __future__ import annotations
 
 import os
-from typing import Any
 
 import requests
 

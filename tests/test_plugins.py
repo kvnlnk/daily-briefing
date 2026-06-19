@@ -5,7 +5,6 @@ from __future__ import annotations
 import importlib.metadata
 from unittest.mock import MagicMock, patch
 
-import pytest
 
 from daily_briefing.config import BriefingConfig, SourceConfig
 from daily_briefing.orchestrator import fetch_all, fetch_single

@@ -8,7 +8,6 @@ Default feeds are kept minimal — the user adds what they want.
 
 from __future__ import annotations
 
-import os
 from collections import OrderedDict
 from typing import Any
 

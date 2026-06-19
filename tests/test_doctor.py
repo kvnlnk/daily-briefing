@@ -7,8 +7,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-import yaml
 
 from daily_briefing.doctor import run_doctor
 
@@ -18,8 +16,6 @@ class TestDoctor:
 
     def test_doctor_with_nonexistent_config(self):
         """Doctor should detect missing config file."""
-        import tempfile
-        from pathlib import Path
 
         orig_cwd = Path.cwd()
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -31,7 +27,6 @@ class TestDoctor:
                 os.chdir(orig_cwd)
 
     def test_doctor_detects_missing_config(self):
-        from unittest.mock import MagicMock
 
         with patch("os.path.exists", return_value=False):
             with patch("daily_briefing.doctor._find_config", return_value=None):

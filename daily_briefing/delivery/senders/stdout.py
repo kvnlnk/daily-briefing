@@ -3,7 +3,6 @@
 Simply prints the message to stdout. Always available as fallback.
 """
 
-from typing import Any
 
 import click
 

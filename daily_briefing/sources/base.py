@@ -6,7 +6,7 @@ This uniform interface means the orchestrator can treat all sources identically
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 

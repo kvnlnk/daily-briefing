@@ -7,11 +7,9 @@ Acts as a health check before running the actual briefing.
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
 
 import click
-import yaml
 
 from daily_briefing.config import load_config
 from daily_briefing.orchestrator import discover_sources
@@ -46,7 +44,7 @@ def run_doctor(config_path: str | None = None) -> bool:
             config_path = str(found)
             click.echo(f"  {found}  ✅")
         else:
-            click.echo(f"  No brief.yaml found  ❌")
+            click.echo("  No brief.yaml found  ❌")
             click.echo("  Run 'daily-briefing setup' to create one.")
             all_ok = False
 
@@ -121,7 +119,7 @@ def run_doctor(config_path: str | None = None) -> bool:
             if topic:
                 click.echo(f"  ntfy        ✅ topic='{topic}'")
             else:
-                click.echo(f"  ntfy        ⚠️  no topic configured")
+                click.echo("  ntfy        ⚠️  no topic configured")
                 all_ok = False
         else:
             click.echo(f"  {method:12} ⚠️  unknown method")

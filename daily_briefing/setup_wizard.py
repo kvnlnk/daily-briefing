@@ -6,7 +6,6 @@ and .env for the first time.
 
 from __future__ import annotations
 
-import os
 import shutil
 from pathlib import Path
 
@@ -55,8 +54,8 @@ def run_setup(config_path: str | None = None, env_path: str | None = None) -> No
     click.echo("")
     click.echo("Next steps:")
     click.echo(f"  1. Edit {env_path} with your API keys (if needed)")
-    click.echo(f"  2. Run 'daily-briefing doctor' to verify")
-    click.echo(f"  3. Run 'daily-briefing' to get your first briefing")
+    click.echo("  2. Run 'daily-briefing doctor' to verify")
+    click.echo("  3. Run 'daily-briefing' to get your first briefing")
 
 
 def _setup_config(config_path: str) -> None:
@@ -141,7 +140,7 @@ def _ask_weather(config: dict, config_path: str) -> None:
     current_locs = current.get("locations", [])
 
     if current_locs:
-        click.echo(f"  Already configured: {', '.join(l.get('name', '?') for l in current_locs)}")
+        click.echo(f"  Already configured: {', '.join(loc.get('name', '?') for loc in current_locs)}")
         if not click.confirm("  Add another location?", default=False):
             return
 

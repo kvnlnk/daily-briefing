@@ -1,5 +1,4 @@
 """Tests for orchestrator — parallel fetch, timeout, error handling."""
-import pytest
 from daily_briefing.orchestrator import fetch_all, fetch_single
 from daily_briefing.config import BriefingConfig, SourceConfig
 

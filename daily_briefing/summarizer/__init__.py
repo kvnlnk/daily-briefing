@@ -6,9 +6,7 @@ Default provider is prompt-only (zero configuration).
 
 from __future__ import annotations
 
-from typing import Any
-
-from daily_briefing.summarizer.base import SummarizerProtocol, SummarizerResult
+from daily_briefing.summarizer.base import SummarizerProtocol, SummarizerResult as SummarizerResult
 from daily_briefing.summarizer.providers.prompt_only import PromptOnlyProvider
 
 # Registry of available providers. New providers register here.

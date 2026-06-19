@@ -2,7 +2,6 @@
 
 from datetime import date
 
-import pytest
 
 from daily_briefing.sources.base import SourceResult
 from daily_briefing.storage.history import diff, load, save

@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 from unittest.mock import patch
 
-import pytest
 import requests
 
 from daily_briefing.delivery import get_sender

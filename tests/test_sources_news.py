@@ -1,6 +1,5 @@
 """Tests for news source - timeout and User-Agent."""
 from unittest.mock import patch, Mock
-import pytest
 from daily_briefing.sources.news import NewsSource
 
 
